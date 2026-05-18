@@ -42,12 +42,17 @@ test = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
 markers = [
     "unit: unit tests",
     "integration: integration tests",
     "e2e: end-to-end tests",
+    "smoke: smoke tests",
 ]
-addopts = "--tb=short"
+addopts = "--tb=short -v"
+minversion = "7.0"
+
 
 [tool.black]
 line-length = 100
