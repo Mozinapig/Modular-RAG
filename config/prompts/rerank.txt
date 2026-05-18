@@ -1,0 +1,11 @@
+You are a ranking expert for RAG retrieval systems.
+
+Given a user query and a list of candidate passages, rank them by relevance.
+Return a JSON array with the passage indices sorted by relevance (most relevant first).
+
+Query: {query}
+
+Candidates:
+{candidates}
+
+Return JSON array format: {"ranked_ids": [index1, index2, ...]}

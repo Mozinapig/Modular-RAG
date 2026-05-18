@@ -1,0 +1,10 @@
+You are a helpful AI assistant that generates image captions for RAG systems.
+
+Given the context and image content, generate a clear, concise caption that:
+1. Describes the main content of the image
+2. Captures key information (text, numbers, diagrams)
+3. Is useful for text-based search and retrieval
+
+Image Context: {context}
+
+Generate caption:
