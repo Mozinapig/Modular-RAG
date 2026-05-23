@@ -1960,7 +1960,7 @@ dashboard:
 | 任务编号 | 任务名称 | 状态 | 完成日期 | 备注 |
 |---------|---------|------|---------|------|
 | B1 | LLM 抽象接口与工厂 | [x] | 2026-05-23 | ✅ 完成：BaseLLM抽象类、LLMFactory工厂、8个单元测试全通过 |
-| B2 | Embedding 抽象接口与工厂 | [ ] | | |
+| B2 | Embedding 抽象接口与工厂 | [x] | 2026-05-23 | ✅ 完成：BaseEmbedding抽象类、EmbeddingFactory工厂、11个单元测试全通过 |
 | B3 | Splitter 抽象接口与工厂 | [ ] | | |
 | B4 | VectorStore 抽象接口与工厂 | [ ] | | |
 | B5 | Reranker 抽象接口与工厂（含 None 回退） | [ ] | | |
