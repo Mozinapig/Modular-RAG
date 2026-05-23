@@ -122,3 +122,5 @@ Round 3 still failing → STOP, show failure report to user
 ```
 
 On "next", loop back to step 1 and start the next task.
+
+# 你必须按照TDD规范,先写测试代码!
