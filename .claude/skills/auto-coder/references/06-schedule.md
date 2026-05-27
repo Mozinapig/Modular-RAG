@@ -56,7 +56,7 @@
 | B5 | Reranker 抽象接口与工厂（含 None 回退） | [x] | 2026-05-23 | ✅ 完成：BaseReranker抽象类、RerankerFactory工厂、NoneReranker实现、12个单元测试全通过 |
 | B6 | Evaluator 抽象接口与工厂 | [x] | 2026-05-23 | ✅ 完成：BaseEvaluator抽象类、EvaluatorFactory工厂、CustomEvaluator实现、18个单元测试全通过 |
 | B7.1 | OpenAI-Compatible LLM 实现 | [x] | 2026-05-27 | ✅ 完成：OpenAILLM、AzureLLM、DeepSeekLLM实现、21个单元测试全通过 |
-| B7.2 | Ollama LLM 实现 | [ ] | | |
+| B7.2 | Ollama LLM 实现 | [x] | 2026-05-27 | ✅ 完成：OllamaLLM实现、15个单元测试全通过 |
 | B7.3 | OpenAI & Azure Embedding 实现 | [ ] | | |
 | B7.4 | Ollama Embedding 实现 | [ ] | | |
 | B7.5 | Recursive Splitter 默认实现 | [ ] | | |

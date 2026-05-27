@@ -49,6 +49,17 @@ class EmbeddingFactory:
         "fake": FakeEmbedding,
     }
 
+    @classmethod
+    def _register_default_providers(cls) -> None:
+        """Register default providers (lazy loading to avoid import errors)."""
+        if "openai" not in cls._providers:
+            from src.libs.embedding.openai_embedding import OpenAIEmbedding
+            cls._providers["openai"] = OpenAIEmbedding
+
+        if "azure" not in cls._providers:
+            from src.libs.embedding.azure_embedding import AzureEmbedding
+            cls._providers["azure"] = AzureEmbedding
+
     def create(self, settings: EmbeddingSettings) -> BaseEmbedding:
         """
         Create an Embedding instance based on settings.
@@ -62,6 +73,9 @@ class EmbeddingFactory:
         Raises:
             ValueError: If provider is unknown or configuration is invalid
         """
+        # Register default providers on first use
+        self._register_default_providers()
+
         # Validate basic settings
         if not settings.provider:
             raise ValueError("Embedding provider is required")
@@ -74,7 +88,7 @@ class EmbeddingFactory:
 
         if provider not in self._providers:
             raise ValueError(
-                f"Unknown embedding provider: {provider}. "
+                f"Unknown Embedding provider: {provider}. "
                 f"Supported providers: {', '.join(self._providers.keys())}"
             )
 
