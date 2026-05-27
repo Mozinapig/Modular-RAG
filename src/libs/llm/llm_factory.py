@@ -4,7 +4,7 @@ from typing import Dict, Type
 
 from src.libs.llm.base_llm import BaseLLM
 from src.libs.llm.base_vision_llm import BaseVisionLLM
-from src.core.settings import LLMSettings
+from src.core.settings import LLMSettings, VisionLLMSettings
 
 
 class FakeLLM(BaseLLM):
@@ -31,6 +31,29 @@ class FakeLLM(BaseLLM):
             raise ValueError("Model name is required")
 
 
+class FakeVisionLLM(BaseVisionLLM):
+    """Fake Vision LLM implementation for testing."""
+
+    def __init__(self, settings):
+        self.settings = settings
+
+    def chat_with_image(self, text, image_path=None, image_base64=None, trace=None):
+        """Return a fixed fake response."""
+        from src.libs.llm.base_vision_llm import VisionChatResponse
+
+        return VisionChatResponse(
+            content="Fake vision response: The image shows [mock analysis]",
+            model=self.settings.model,
+            finish_reason="stop",
+            usage={"prompt_tokens": 50, "completion_tokens": 20, "total_tokens": 70},
+        )
+
+    def validate_config(self):
+        """Validate config (no-op for fake)."""
+        if not self.settings.model:
+            raise ValueError("Model name is required")
+
+
 class LLMFactory:
     """Factory for creating LLM instances based on settings."""
 
@@ -40,7 +63,9 @@ class LLMFactory:
     }
 
     # Vision LLM provider registry
-    _vision_providers: Dict[str, Type[BaseVisionLLM]] = {}
+    _vision_providers: Dict[str, Type[BaseVisionLLM]] = {
+        "fake": FakeVisionLLM,
+    }
 
     @classmethod
     def _register_default_providers(cls) -> None:
@@ -60,6 +85,13 @@ class LLMFactory:
         if "ollama" not in cls._providers:
             from src.libs.llm.ollama_llm import OllamaLLM
             cls._providers["ollama"] = OllamaLLM
+
+    @classmethod
+    def _register_default_vision_providers(cls) -> None:
+        """Register default vision LLM providers (lazy loading to avoid import errors)."""
+        if "openai" not in cls._vision_providers:
+            from src.libs.llm.openai_vision_llm import OpenAIVisionLLM
+            cls._vision_providers["openai"] = OpenAIVisionLLM
 
     def create(self, settings: LLMSettings) -> BaseLLM:
         """
@@ -123,12 +155,12 @@ class LLMFactory:
         """
         cls._vision_providers[name.lower()] = provider_class
 
-    def create_vision_llm(self, settings: LLMSettings) -> BaseVisionLLM:
+    def create_vision_llm(self, settings: VisionLLMSettings) -> BaseVisionLLM:
         """
         Create a Vision LLM instance based on settings.
 
         Args:
-            settings: LLMSettings object with provider configuration
+            settings: VisionLLMSettings object with provider configuration
 
         Returns:
             BaseVisionLLM instance
@@ -136,6 +168,9 @@ class LLMFactory:
         Raises:
             ValueError: If provider is unknown or configuration is invalid
         """
+        # Register default providers on first use
+        self._register_default_vision_providers()
+
         # Validate basic settings
         if not settings.provider:
             raise ValueError("Vision LLM provider is required")
