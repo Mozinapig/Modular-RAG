@@ -60,6 +60,10 @@ class EmbeddingFactory:
             from src.libs.embedding.azure_embedding import AzureEmbedding
             cls._providers["azure"] = AzureEmbedding
 
+        if "ollama" not in cls._providers:
+            from src.libs.embedding.ollama_embedding import OllamaEmbedding
+            cls._providers["ollama"] = OllamaEmbedding
+
     def create(self, settings: EmbeddingSettings) -> BaseEmbedding:
         """
         Create an Embedding instance based on settings.

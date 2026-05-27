@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(.\\\\.venv\\\\Scripts\\\\Activate.ps1)",
+      "Bash(python .claude/skills/auto-coder/scripts/sync_spec.py)"
     ]
   }
 }
