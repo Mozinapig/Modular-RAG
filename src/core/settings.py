@@ -98,6 +98,15 @@ class RerankerSettings:
     backend: str = "none"
     model: Optional[str] = None
     top_m: int = 30
+    api_key: Optional[str] = None
+    base_url: Optional[str] = None
+    extra: Dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self):
+        if self.api_key:
+            self.api_key = os.path.expandvars(self.api_key)
+        if self.base_url:
+            self.base_url = os.path.expandvars(self.base_url)
 
 
 @dataclass
@@ -222,6 +231,10 @@ def _parse_settings(data: Dict[str, Any]) -> Settings:
         backend=rerank_data.get('backend', 'none'),
         model=rerank_data.get('model'),
         top_m=rerank_data.get('top_m', 30),
+        api_key=rerank_data.get('api_key'),
+        base_url=rerank_data.get('base_url'),
+        extra={k: v for k, v in rerank_data.items()
+               if k not in ['backend', 'model', 'top_m', 'api_key', 'base_url']}
     )
 
     obs_data = data.get('observability', {})

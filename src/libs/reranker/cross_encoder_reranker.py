@@ -1,6 +1,9 @@
 """Cross-Encoder based Reranker implementation."""
 
+import json
 from typing import List, Dict, Optional, Any
+
+import requests
 
 from src.libs.reranker.base_reranker import BaseReranker
 
@@ -128,25 +131,100 @@ class CrossEncoderReranker(BaseReranker):
             seen_ids.add(candidate_id)
 
     def _call_scorer(self, query: str, texts: List[str]) -> List[float]:
-        """Call Cross-Encoder scorer to get relevance scores."""
-        try:
-            # In real usage, load the cross-encoder model and score pairs
-            # For now, this would be implemented with:
-            # from sentence_transformers import CrossEncoder
-            # if self.scorer is None:
-            #     self.scorer = CrossEncoder(self.model_name)
-            # scores = self.scorer.predict([[query, text] for text in texts])
+        """Call Cross-Encoder scorer API to get relevance scores.
 
-            # This is a placeholder that will be mocked in tests
-            # and would use actual scorer in production
-            raise NotImplementedError(
-                "Cross-Encoder scorer not initialized. "
-                "In tests, patch _call_scorer with mock scores."
+        Supports BGE Reranker and OpenAI-compatible Rerank APIs.
+
+        Raises:
+            ValueError: If configuration is missing or invalid
+            TimeoutError: If API call times out
+            RuntimeError: If API call fails
+        """
+        # Get reranker config
+        reranker_config = self._get_reranker_config()
+
+        # Check for required API fields
+        api_key = reranker_config.get("api_key") if isinstance(reranker_config, dict) else getattr(reranker_config, "api_key", None)
+        base_url = reranker_config.get("base_url") if isinstance(reranker_config, dict) else getattr(reranker_config, "base_url", None)
+
+        if not api_key or not base_url:
+            raise ValueError(
+                "Cross-Encoder API requires 'api_key' and 'base_url' configuration. "
+                "Set these in your settings.yaml or environment variables."
             )
-        except TimeoutError:
-            raise
-        except NotImplementedError:
-            raise
+
+        # Prepare request data for BGE Reranker API
+        # Typical format: {"query": "...", "passages": ["...", "..."]}
+        request_data = {
+            "query": query,
+            "passages": texts,
+        }
+
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        }
+
+        try:
+            # Call the reranker API
+            url = f"{base_url.rstrip('/')}/v1/rerank"
+            response = requests.post(url, json=request_data, headers=headers, timeout=30)
+
+            # Handle HTTP errors
+            if response.status_code != 200:
+                error_msg = response.text if response.text else f"HTTP {response.status_code}"
+                raise RuntimeError(f"Reranker API error: {error_msg}")
+
+            # Parse response and extract scores
+            result = response.json()
+
+            # Expected format: {"results": [{"index": 0, "score": 0.9}, ...]}
+            if "results" not in result:
+                raise ValueError(
+                    f"Unexpected API response format. Expected 'results' field. Got: {result}"
+                )
+
+            # Extract scores maintaining original order
+            scores_by_index = {}
+            for item in result["results"]:
+                idx = item.get("index")
+                score = item.get("score")
+                if idx is None or score is None:
+                    raise ValueError(
+                        f"Invalid result item format. Expected 'index' and 'score'. Got: {item}"
+                    )
+                scores_by_index[idx] = float(score)
+
+            # Return scores in original order
+            scores = [scores_by_index.get(i, 0.0) for i in range(len(texts))]
+            return scores
+
+        except requests.exceptions.Timeout:
+            raise TimeoutError("Reranker API request timeout")
+        except requests.exceptions.RequestException as e:
+            raise RuntimeError(f"Reranker API request failed: {str(e)}")
+        except (json.JSONDecodeError, ValueError) as e:
+            raise ValueError(f"Failed to parse reranker API response: {str(e)}")
+
+    def _get_reranker_config(self) -> Dict[str, Any]:
+        """Extract reranker config from settings."""
+        if hasattr(self.settings, "rerank"):
+            # Full Settings object
+            config = self.settings.rerank
+        else:
+            # Direct config object
+            config = self.settings
+
+        if isinstance(config, dict):
+            return config
+
+        # Convert object to dict for easier access
+        return {
+            "backend": getattr(config, "backend", None),
+            "model": getattr(config, "model", None),
+            "api_key": getattr(config, "api_key", None),
+            "base_url": getattr(config, "base_url", None),
+        }
 
     def _validate_scores(
         self, scores: List[float], candidates: List[Dict[str, Any]]
