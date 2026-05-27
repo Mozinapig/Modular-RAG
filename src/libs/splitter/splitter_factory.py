@@ -3,6 +3,7 @@
 from typing import Dict, Type
 
 from src.libs.splitter.base_splitter import BaseSplitter
+from src.libs.splitter.recursive_splitter import RecursiveSplitter
 
 
 class FakeSplitter(BaseSplitter):
@@ -43,6 +44,7 @@ class SplitterFactory:
     # Provider registry mapping
     _providers: Dict[str, Type[BaseSplitter]] = {
         "fake": FakeSplitter,
+        "recursive": RecursiveSplitter,
     }
 
     def create(self, settings) -> BaseSplitter:
