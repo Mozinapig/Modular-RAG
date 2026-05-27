@@ -3,6 +3,7 @@
 from typing import Dict, Type
 
 from src.libs.vector_store.base_vector_store import BaseVectorStore, VectorRecord
+from src.libs.vector_store.chroma_store import ChromaStore
 
 
 class FakeVectorStore(BaseVectorStore):
@@ -74,6 +75,7 @@ class VectorStoreFactory:
     # Provider registry mapping
     _providers: Dict[str, Type[BaseVectorStore]] = {
         "fake": FakeVectorStore,
+        "chroma": ChromaStore,
     }
 
     def create(self, settings) -> BaseVectorStore:
@@ -81,7 +83,7 @@ class VectorStoreFactory:
         Create a VectorStore instance based on settings.
 
         Args:
-            settings: VectorStoreSettings object with provider configuration
+            settings: Settings object (can be full Settings or dict with vector_store config)
 
         Returns:
             BaseVectorStore instance
@@ -89,11 +91,21 @@ class VectorStoreFactory:
         Raises:
             ValueError: If provider is unknown or configuration is invalid
         """
-        # Validate basic settings
-        if not settings.provider:
-            raise ValueError("VectorStore provider is required")
+        # Extract provider from settings
+        provider = None
 
-        provider = settings.provider.lower()
+        # Check if settings has vector_store dict with backend key
+        if hasattr(settings, 'vector_store') and isinstance(settings.vector_store, dict):
+            provider = settings.vector_store.get('backend') or settings.vector_store.get('provider')
+        elif hasattr(settings, 'provider'):
+            # For backward compatibility, also check for direct provider attribute
+            provider = settings.provider
+
+        # Validate provider
+        if not provider:
+            raise ValueError("VectorStore provider is required in settings")
+
+        provider = provider.lower()
 
         if provider not in self._providers:
             raise ValueError(
