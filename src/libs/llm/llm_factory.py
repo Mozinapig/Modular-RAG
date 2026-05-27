@@ -3,6 +3,7 @@
 from typing import Dict, Type
 
 from src.libs.llm.base_llm import BaseLLM
+from src.libs.llm.base_vision_llm import BaseVisionLLM
 from src.core.settings import LLMSettings
 
 
@@ -37,6 +38,9 @@ class LLMFactory:
     _providers: Dict[str, Type[BaseLLM]] = {
         "fake": FakeLLM,
     }
+
+    # Vision LLM provider registry
+    _vision_providers: Dict[str, Type[BaseVisionLLM]] = {}
 
     @classmethod
     def _register_default_providers(cls) -> None:
@@ -107,3 +111,51 @@ class LLMFactory:
             provider_class: Class that extends BaseLLM
         """
         cls._providers[name.lower()] = provider_class
+
+    @classmethod
+    def register_vision_provider(cls, name: str, provider_class: Type[BaseVisionLLM]) -> None:
+        """
+        Register a new Vision LLM provider.
+
+        Args:
+            name: Provider name (lowercase)
+            provider_class: Class that extends BaseVisionLLM
+        """
+        cls._vision_providers[name.lower()] = provider_class
+
+    def create_vision_llm(self, settings: LLMSettings) -> BaseVisionLLM:
+        """
+        Create a Vision LLM instance based on settings.
+
+        Args:
+            settings: LLMSettings object with provider configuration
+
+        Returns:
+            BaseVisionLLM instance
+
+        Raises:
+            ValueError: If provider is unknown or configuration is invalid
+        """
+        # Validate basic settings
+        if not settings.provider:
+            raise ValueError("Vision LLM provider is required")
+        if not settings.model:
+            raise ValueError("Model name is required")
+        if not settings.api_key or settings.api_key.strip() == "":
+            raise ValueError("Vision LLM api_key is required")
+
+        provider = settings.provider.lower()
+
+        if provider not in self._vision_providers:
+            raise ValueError(
+                f"Unknown Vision LLM provider: {provider}. "
+                f"Supported providers: {', '.join(self._vision_providers.keys())}"
+            )
+
+        provider_class = self._vision_providers[provider]
+        vision_llm = provider_class(settings)
+
+        # Validate provider-specific config
+        vision_llm.validate_config()
+
+        return vision_llm

@@ -1973,7 +1973,7 @@ dashboard:
 | B7.6 | ChromaStore 默认实现 | [x] | 2026-05-27 | ✅ 完成：ChromaStore实现（含Windows兼容性fallback）、9个集成测试全通过、工厂集成 |
 | B7.7 | LLM Reranker 实现 | [x] | 2026-05-27 | ✅ 完成：LLMReranker实现、17个单元测试全通过、工厂集成 |
 | B7.8 | Cross-Encoder Reranker 实现 | [x] | 2026-05-27 | ✅ 完成：CrossEncoderReranker实现、22个单元测试全通过、工厂集成 |
-| B8 | Vision LLM 抽象接口与工厂集成 | [ ] | | |
+| B8 | Vision LLM 抽象接口与工厂集成 | [x] | 2026-05-27 | ✅ 完成：BaseVisionLLM抽象类、LLMFactory.create_vision_llm()方法、14个单元测试全通过 |
 | B9 | Azure Vision LLM 实现 | [ ] | | |
 
 #### 阶段 C：Ingestion Pipeline MVP
@@ -2067,7 +2067,7 @@ dashboard:
 | 阶段 | 总任务数 | 已完成 | 进度 |
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
-| 阶段 B | 16 | 10 | 63% |
+| 阶段 B | 16 | 11 | 69% |
 | 阶段 C | 15 | 0 | 0% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
@@ -2075,7 +2075,7 @@ dashboard:
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **13** | **19%** |
+| **总计** | **68** | **14** | **21%** |
 
 
 ---
