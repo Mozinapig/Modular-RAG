@@ -4,6 +4,7 @@ from typing import Dict, Type, List, Any, Optional
 
 from src.libs.reranker.base_reranker import BaseReranker
 from src.libs.reranker.llm_reranker import LLMReranker
+from src.libs.reranker.cross_encoder_reranker import CrossEncoderReranker
 
 
 class NoneReranker(BaseReranker):
@@ -34,6 +35,7 @@ class RerankerFactory:
     _providers: Dict[str, Type[BaseReranker]] = {
         "none": NoneReranker,
         "llm": LLMReranker,
+        "cross_encoder": CrossEncoderReranker,
     }
 
     def create(self, settings) -> BaseReranker:
