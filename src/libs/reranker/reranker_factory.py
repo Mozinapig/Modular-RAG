@@ -49,29 +49,31 @@ class RerankerFactory:
         Raises:
             ValueError: If provider is unknown or configuration is invalid
         """
-        # Handle dict input - convert to RerankerSettings-like object with provider attribute
+        # Extract provider from settings
+        provider = None
+
         if isinstance(settings, dict):
-            # Create a simple object to hold the dict data
-            provider = settings.get("backend", "none")
+            # Dict-like settings
+            provider = settings.get("backend") or settings.get("provider")
         else:
-            # It's a RerankerSettings or similar object
-            provider = getattr(settings, "backend", settings.provider if hasattr(settings, "provider") else "none")
+            # Object-like settings - try both 'provider' and 'backend' attributes
+            provider = getattr(settings, "provider", None) or getattr(settings, "backend", None)
 
         if not provider:
             raise ValueError("Reranker provider is required")
 
-        provider = provider.lower()
+        # Convert to string and lowercase for comparison
+        provider_str = str(provider).lower()
 
-        if provider not in self._providers:
+        if provider_str not in self._providers:
             raise ValueError(
-                f"Unknown Reranker provider: {provider}. "
+                f"Unknown Reranker provider: {provider_str}. "
                 f"Supported providers: {', '.join(self._providers.keys())}"
             )
 
-        provider_class = self._providers[provider]
+        provider_class = self._providers[provider_str]
 
-        # For dict input, we need to wrap it or reconstruct the full settings
-        # Pass the original settings object, not the dict
+        # Convert dict to RerankerSettings if needed
         if isinstance(settings, dict):
             from src.core.settings import RerankerSettings
             settings = RerankerSettings(**settings)
