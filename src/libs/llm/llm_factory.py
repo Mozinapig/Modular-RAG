@@ -38,6 +38,21 @@ class LLMFactory:
         "fake": FakeLLM,
     }
 
+    @classmethod
+    def _register_default_providers(cls) -> None:
+        """Register default providers (lazy loading to avoid import errors)."""
+        if "openai" not in cls._providers:
+            from src.libs.llm.openai_llm import OpenAILLM
+            cls._providers["openai"] = OpenAILLM
+
+        if "azure" not in cls._providers:
+            from src.libs.llm.azure_llm import AzureLLM
+            cls._providers["azure"] = AzureLLM
+
+        if "deepseek" not in cls._providers:
+            from src.libs.llm.deepseek_llm import DeepSeekLLM
+            cls._providers["deepseek"] = DeepSeekLLM
+
     def create(self, settings: LLMSettings) -> BaseLLM:
         """
         Create an LLM instance based on settings.
@@ -51,6 +66,9 @@ class LLMFactory:
         Raises:
             ValueError: If provider is unknown or configuration is invalid
         """
+        # Register default providers on first use
+        self._register_default_providers()
+
         # Validate basic settings
         if not settings.provider:
             raise ValueError("LLM provider is required")

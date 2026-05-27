@@ -17,8 +17,11 @@ class LLMSettings:
     model: str
     api_key: str
     temperature: float = 0.7
+    max_tokens: Optional[int] = None
     base_url: Optional[str] = None
     azure_endpoint: Optional[str] = None
+    azure_deployment: Optional[str] = None
+    api_version: Optional[str] = None
     extra: Dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
@@ -28,6 +31,8 @@ class LLMSettings:
             self.base_url = os.path.expandvars(self.base_url)
         if self.azure_endpoint:
             self.azure_endpoint = os.path.expandvars(self.azure_endpoint)
+        if self.azure_deployment:
+            self.azure_deployment = os.path.expandvars(self.azure_deployment)
 
 
 @dataclass
