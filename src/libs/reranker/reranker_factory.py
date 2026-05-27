@@ -3,6 +3,7 @@
 from typing import Dict, Type, List, Any, Optional
 
 from src.libs.reranker.base_reranker import BaseReranker
+from src.libs.reranker.llm_reranker import LLMReranker
 
 
 class NoneReranker(BaseReranker):
@@ -32,6 +33,7 @@ class RerankerFactory:
     # Provider registry mapping
     _providers: Dict[str, Type[BaseReranker]] = {
         "none": NoneReranker,
+        "llm": LLMReranker,
     }
 
     def create(self, settings) -> BaseReranker:
@@ -39,7 +41,7 @@ class RerankerFactory:
         Create a Reranker instance based on settings.
 
         Args:
-            settings: RerankerSettings object with provider configuration
+            settings: RerankerSettings object or settings dict with provider configuration
 
         Returns:
             BaseReranker instance
@@ -47,11 +49,18 @@ class RerankerFactory:
         Raises:
             ValueError: If provider is unknown or configuration is invalid
         """
-        # Validate basic settings
-        if not settings.provider:
+        # Handle dict input - convert to RerankerSettings-like object with provider attribute
+        if isinstance(settings, dict):
+            # Create a simple object to hold the dict data
+            provider = settings.get("backend", "none")
+        else:
+            # It's a RerankerSettings or similar object
+            provider = getattr(settings, "backend", settings.provider if hasattr(settings, "provider") else "none")
+
+        if not provider:
             raise ValueError("Reranker provider is required")
 
-        provider = settings.provider.lower()
+        provider = provider.lower()
 
         if provider not in self._providers:
             raise ValueError(
@@ -60,6 +69,13 @@ class RerankerFactory:
             )
 
         provider_class = self._providers[provider]
+
+        # For dict input, we need to wrap it or reconstruct the full settings
+        # Pass the original settings object, not the dict
+        if isinstance(settings, dict):
+            from src.core.settings import RerankerSettings
+            settings = RerankerSettings(**settings)
+
         reranker = provider_class(settings)
 
         # Validate provider-specific config
