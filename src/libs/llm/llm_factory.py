@@ -53,6 +53,10 @@ class LLMFactory:
             from src.libs.llm.deepseek_llm import DeepSeekLLM
             cls._providers["deepseek"] = DeepSeekLLM
 
+        if "ollama" not in cls._providers:
+            from src.libs.llm.ollama_llm import OllamaLLM
+            cls._providers["ollama"] = OllamaLLM
+
     def create(self, settings: LLMSettings) -> BaseLLM:
         """
         Create an LLM instance based on settings.
