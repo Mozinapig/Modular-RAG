@@ -1,0 +1,19 @@
+You are a metadata extraction expert. Extract semantic metadata from the following text chunk.
+
+Text Chunk:
+```
+{text}
+```
+
+Generate a JSON object with exactly these fields:
+- "title": A concise title (max 150 chars) summarizing the main topic
+- "summary": A brief summary (2-3 sentences, max 500 chars) of the key points
+- "tags": A list of 3-10 relevant tags (lowercase strings, no spaces)
+
+Requirements:
+- Title should be clear and informative, not generic
+- Summary should capture the essence, not just repeat the title
+- Tags should be specific topics, concepts, or entities mentioned in the text
+- Be concise and precise
+
+Return ONLY valid JSON, no additional text or explanation.
