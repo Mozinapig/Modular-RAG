@@ -1983,7 +1983,7 @@ dashboard:
 | C1 | 定义核心数据类型/契约（Document/Chunk/ChunkRecord） | [x] | 2026-05-28 | ✅ 完成：Document/Chunk/ChunkRecord/ImageRef/RetrievalResult 类型、33个单元测试全通过 |
 | C2 | 文件完整性检查（SHA256） | [x] | 2026-05-28 | ✅ 完成：FileIntegrityChecker 抽象接口、SQLiteIntegrityChecker 实现、16 个单元测试全通过、WAL 模式支持并发 |
 | C3 | Loader 抽象基类与 PDF Loader | [x] | 2026-05-28 | ✅ 完成：BaseLoader 抽象接口、PdfLoader 实现（markitdown + PyMuPDF）、图片提取与占位符插入、20 个单元测试全通过 |
-| C4 | Splitter 集成（调用 Libs） | [ ] | | |
+| C4 | Splitter 集成（调用 Libs） | [x] | 2026-05-28 | ✅ 完成：DocumentChunker 实现（调用 libs.splitter）、Chunk ID 确定性生成、元数据继承、图片引用按需分发、24 个单元测试全通过 |
 | C5 | Transform 基类 + ChunkRefiner | [ ] | | |
 | C6 | MetadataEnricher | [ ] | | |
 | C7 | ImageCaptioner | [ ] | | |
@@ -2068,14 +2068,14 @@ dashboard:
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
 | 阶段 B | 16 | 16 | 100% |
-| 阶段 C | 15 | 2 | 13% |
+| 阶段 C | 15 | 4 | 27% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **24** | **35%** |
+| **总计** | **68** | **25** | **37%** |
 
 
 ---
