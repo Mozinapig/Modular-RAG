@@ -125,6 +125,7 @@ On "next", loop back to step 1 and start the next task.
 
 # 注意事项如下：
 ## 你必须按照TDD规范,先写测试代码!
+## 项目目录为D:\pythonProject\Modular-RAG
 ## 激活环境使用source .venv/Scripts/activate
 ## 每完成一个feature,请你修改DEVSPEC.md内的进度
 ## python版本为Python 3.12.4

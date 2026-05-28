@@ -75,7 +75,7 @@
 | C3 | Loader 抽象基类与 PDF Loader | [x] | 2026-05-28 | ✅ 完成：BaseLoader 抽象接口、PdfLoader 实现（markitdown + PyMuPDF）、图片提取与占位符插入、20 个单元测试全通过 |
 | C4 | Splitter 集成（调用 Libs） | [x] | 2026-05-28 | ✅ 完成：DocumentChunker 实现（调用 libs.splitter）、Chunk ID 确定性生成、元数据继承、图片引用按需分发、24 个单元测试全通过 |
 | C5 | Transform 基类 + ChunkRefiner | [x] | 2026-05-28 | ✅ 完成：BaseTransform 抽象接口、ChunkRefiner 实现（规则去噪 + LLM 增强）、TraceContext 最小实现、23 个单元测试全通过 |
-| C6 | MetadataEnricher | [ ] | | |
+| C6 | MetadataEnricher | [x] | 2026-05-28 | ✅ 完成：MetadataEnricher 实现（规则增强 + LLM 增强）、title/summary/tags 生成、29 个单元测试全通过 |
 | C7 | ImageCaptioner | [ ] | | |
 | C8 | DenseEncoder | [ ] | | |
 | C9 | SparseEncoder | [ ] | | |
@@ -158,14 +158,14 @@
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
 | 阶段 B | 16 | 16 | 100% |
-| 阶段 C | 15 | 5 | 33% |
+| 阶段 C | 15 | 6 | 40% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **26** | **38%** |
+| **总计** | **68** | **27** | **40%** |
 
 
 ---
