@@ -123,7 +123,8 @@ Round 3 still failing → STOP, show failure report to user
 
 On "next", loop back to step 1 and start the next task.
 
-# 你必须按照TDD规范,先写测试代码!
-# 激活环境使用source .venv/Scripts/activate
-# 每完成一个feature,请你修改DEVSPEC.md内的进度
-# python版本为Python 3.12.4
+# 注意事项如下：
+## 你必须按照TDD规范,先写测试代码!
+## 激活环境使用source .venv/Scripts/activate
+## 每完成一个feature,请你修改DEVSPEC.md内的进度
+## python版本为Python 3.12.4
