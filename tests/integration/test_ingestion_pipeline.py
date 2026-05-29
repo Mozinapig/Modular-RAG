@@ -56,12 +56,12 @@ class TestIngestionPipelineBasicFlow:
     """Tests for basic pipeline execution flow."""
 
     def test_run_with_simple_document(self):
-        """Should process a simple PDF document end-to-end."""
+        """Should process a complex technical document end-to-end."""
         with tempfile.TemporaryDirectory() as tmpdir:
             pipeline = IngestionPipeline(base_path=tmpdir)
 
             # Use sample PDF from fixtures
-            pdf_path = "tests/fixtures/sample_documents/simple.pdf"
+            pdf_path = "tests/fixtures/sample_documents/complex_technical_doc.pdf"
             if not Path(pdf_path).exists():
                 pytest.skip(f"Sample PDF not found: {pdf_path}")
 
@@ -78,7 +78,7 @@ class TestIngestionPipelineBasicFlow:
         with tempfile.TemporaryDirectory() as tmpdir:
             pipeline = IngestionPipeline(base_path=tmpdir)
 
-            pdf_path = "tests/fixtures/sample_documents/simple.pdf"
+            pdf_path = "tests/fixtures/sample_documents/complex_technical_doc.pdf"
             if not Path(pdf_path).exists():
                 pytest.skip(f"Sample PDF not found: {pdf_path}")
 
@@ -95,7 +95,7 @@ class TestIngestionPipelineBasicFlow:
         with tempfile.TemporaryDirectory() as tmpdir:
             pipeline = IngestionPipeline(base_path=tmpdir)
 
-            pdf_path = "tests/fixtures/sample_documents/simple.pdf"
+            pdf_path = "tests/fixtures/sample_documents/complex_technical_doc.pdf"
             if not Path(pdf_path).exists():
                 pytest.skip(f"Sample PDF not found: {pdf_path}")
 
@@ -114,7 +114,7 @@ class TestIngestionPipelineStages:
         with tempfile.TemporaryDirectory() as tmpdir:
             pipeline = IngestionPipeline(base_path=tmpdir)
 
-            pdf_path = "tests/fixtures/sample_documents/simple.pdf"
+            pdf_path = "tests/fixtures/sample_documents/complex_technical_doc.pdf"
             if not Path(pdf_path).exists():
                 pytest.skip(f"Sample PDF not found: {pdf_path}")
 
@@ -194,7 +194,7 @@ class TestIngestionPipelineProgressCallback:
             def on_progress(stage: str, current: int, total: int):
                 progress_calls.append((stage, current, total))
 
-            pdf_path = "tests/fixtures/sample_documents/simple.pdf"
+            pdf_path = "tests/fixtures/sample_documents/complex_technical_doc.pdf"
             if not Path(pdf_path).exists():
                 pytest.skip(f"Sample PDF not found: {pdf_path}")
 
@@ -213,7 +213,7 @@ class TestIngestionPipelineProgressCallback:
             def on_progress(stage: str, current: int, total: int):
                 progress_calls.append(stage)
 
-            pdf_path = "tests/fixtures/sample_documents/simple.pdf"
+            pdf_path = "tests/fixtures/sample_documents/complex_technical_doc.pdf"
             if not Path(pdf_path).exists():
                 pytest.skip(f"Sample PDF not found: {pdf_path}")
 
@@ -233,7 +233,7 @@ class TestIngestionPipelineProgressCallback:
             def on_progress(stage: str, current: int, total: int):
                 progress_calls.append({"stage": stage, "current": current, "total": total})
 
-            pdf_path = "tests/fixtures/sample_documents/simple.pdf"
+            pdf_path = "tests/fixtures/sample_documents/complex_technical_doc.pdf"
             if not Path(pdf_path).exists():
                 pytest.skip(f"Sample PDF not found: {pdf_path}")
 
@@ -296,7 +296,7 @@ class TestIngestionPipelineOutput:
         with tempfile.TemporaryDirectory() as tmpdir:
             pipeline = IngestionPipeline(base_path=tmpdir)
 
-            pdf_path = "tests/fixtures/sample_documents/simple.pdf"
+            pdf_path = "tests/fixtures/sample_documents/complex_technical_doc.pdf"
             if not Path(pdf_path).exists():
                 pytest.skip(f"Sample PDF not found: {pdf_path}")
 
@@ -314,7 +314,7 @@ class TestIngestionPipelineOutput:
 
             pipeline = IngestionPipeline(base_path=tmpdir)
 
-            pdf_path = "tests/fixtures/sample_documents/simple.pdf"
+            pdf_path = "tests/fixtures/sample_documents/complex_technical_doc.pdf"
             if not Path(pdf_path).exists():
                 pytest.skip(f"Sample PDF not found: {pdf_path}")
 
@@ -356,7 +356,7 @@ class TestIngestionPipelineTraceContext:
 
             trace = TraceContext(trace_id="test_trace", trace_type="ingestion")
 
-            pdf_path = "tests/fixtures/sample_documents/simple.pdf"
+            pdf_path = "tests/fixtures/sample_documents/complex_technical_doc.pdf"
             if not Path(pdf_path).exists():
                 pytest.skip(f"Sample PDF not found: {pdf_path}")
 
@@ -372,7 +372,7 @@ class TestIngestionPipelineTraceContext:
 
             trace = TraceContext(trace_id="test_trace", trace_type="ingestion")
 
-            pdf_path = "tests/fixtures/sample_documents/simple.pdf"
+            pdf_path = "tests/fixtures/sample_documents/complex_technical_doc.pdf"
             if not Path(pdf_path).exists():
                 pytest.skip(f"Sample PDF not found: {pdf_path}")
 
@@ -419,7 +419,7 @@ class TestIngestionPipelineStatistics:
         with tempfile.TemporaryDirectory() as tmpdir:
             pipeline = IngestionPipeline(base_path=tmpdir)
 
-            pdf_path = "tests/fixtures/sample_documents/simple.pdf"
+            pdf_path = "tests/fixtures/sample_documents/complex_technical_doc.pdf"
             if not Path(pdf_path).exists():
                 pytest.skip(f"Sample PDF not found: {pdf_path}")
 
@@ -433,7 +433,7 @@ class TestIngestionPipelineStatistics:
         with tempfile.TemporaryDirectory() as tmpdir:
             pipeline = IngestionPipeline(base_path=tmpdir)
 
-            pdf_path = "tests/fixtures/sample_documents/simple.pdf"
+            pdf_path = "tests/fixtures/sample_documents/complex_technical_doc.pdf"
             if not Path(pdf_path).exists():
                 pytest.skip(f"Sample PDF not found: {pdf_path}")
 
@@ -447,7 +447,7 @@ class TestIngestionPipelineStatistics:
         with tempfile.TemporaryDirectory() as tmpdir:
             pipeline = IngestionPipeline(base_path=tmpdir)
 
-            pdf_path = "tests/fixtures/sample_documents/simple.pdf"
+            pdf_path = "tests/fixtures/sample_documents/complex_technical_doc.pdf"
             if not Path(pdf_path).exists():
                 pytest.skip(f"Sample PDF not found: {pdf_path}")
 

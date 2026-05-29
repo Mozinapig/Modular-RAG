@@ -114,8 +114,14 @@ class ImageCaptioner(BaseTransform):
         failed_count = 0
 
         for image_ref in image_refs:
-            image_id = image_ref.get("id")
-            image_path = image_ref.get("path")
+            # Support both dict and ImageRef object formats
+            if isinstance(image_ref, dict):
+                image_id = image_ref.get("id")
+                image_path = image_ref.get("path")
+            else:
+                # ImageRef object
+                image_id = getattr(image_ref, "id", None)
+                image_path = getattr(image_ref, "path", None)
 
             if not image_id or not image_path:
                 failed_count += 1
@@ -127,7 +133,9 @@ class ImageCaptioner(BaseTransform):
                     image_path=image_path,
                     trace=trace
                 )
-                captions[image_id] = caption
+                # Extract content from VisionChatResponse
+                caption_text = caption.content if hasattr(caption, 'content') else str(caption)
+                captions[image_id] = caption_text
             except Exception as e:
                 logger.warning(f"Failed to caption image {image_id}: {e}")
                 failed_count += 1
