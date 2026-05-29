@@ -1988,7 +1988,7 @@ dashboard:
 | C6 | MetadataEnricher | [x] | 2026-05-28 | ✅ 完成：MetadataEnricher 实现（规则增强 + LLM 增强）、title/summary/tags 生成、29 个单元测试全通过 |
 | C7 | ImageCaptioner | [x] | 2026-05-28 | ✅ 完成：ImageCaptioner 实现（Vision LLM 增强 + 优雅降级）、图片描述生成、22 个单元测试全通过 |
 | C8 | DenseEncoder | [x] | 2026-05-29 | ✅ 完成：DenseEncoder 实现（批量 embedding + caption 融合）、18 个单元测试全通过 |
-| C9 | SparseEncoder | [ ] | | |
+| C9 | SparseEncoder | [x] | 2026-05-29 | ✅ 完成：SparseEncoder 实现（BM25 统计 + 词项权重提取）、21 个单元测试全通过 |
 | C10 | BatchProcessor | [ ] | | |
 | C11 | BM25Indexer（倒排索引+IDF计算） | [ ] | | |
 | C12 | VectorUpserter（幂等upsert） | [ ] | | |
@@ -2068,14 +2068,14 @@ dashboard:
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
 | 阶段 B | 16 | 16 | 100% |
-| 阶段 C | 15 | 8 | 53% |
+| 阶段 C | 15 | 9 | 60% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **29** | **43%** |
+| **总计** | **68** | **30** | **44%** |
 
 
 ---
