@@ -149,17 +149,13 @@ def print_result_summary(result) -> None:
     print(f"Status:        {'✓ SUCCESS' if result.success else '✗ FAILED'}")
     print(f"Documents:     {result.document_count}")
     print(f"Chunks:        {result.chunk_count}")
+    print(f"Images:        {result.image_count}")
     print(f"Elapsed time:  {result.elapsed_ms:.1f}ms")
 
     if result.errors:
         print("\nErrors:")
         for error in result.errors:
             print(f"  - {error}")
-
-    if result.warnings:
-        print("\nWarnings:")
-        for warning in result.warnings:
-            print(f"  - {warning}")
 
     print("=" * 60 + "\n")
 
