@@ -1989,7 +1989,7 @@ dashboard:
 | C7 | ImageCaptioner | [x] | 2026-05-28 | ✅ 完成：ImageCaptioner 实现（Vision LLM 增强 + 优雅降级）、图片描述生成、22 个单元测试全通过 |
 | C8 | DenseEncoder | [x] | 2026-05-29 | ✅ 完成：DenseEncoder 实现（批量 embedding + caption 融合）、18 个单元测试全通过 |
 | C9 | SparseEncoder | [x] | 2026-05-29 | ✅ 完成：SparseEncoder 实现（BM25 统计 + 词项权重提取）、21 个单元测试全通过 |
-| C10 | BatchProcessor | [x] | 2026-05-29 | ✅ 完成：BatchProcessor 实现（批处理编排 + 双路编码）、17 个单元测试全通过 |
+| C10 | BatchProcessor | [x] | 2026-05-29 | ✅ 完成：BatchProcessor 实现（批处理编排 + 双编码器驱动）、17 个单元测试全通过 |
 | C11 | BM25Indexer（倒排索引+IDF计算） | [ ] | | |
 | C12 | VectorUpserter（幂等upsert） | [ ] | | |
 | C13 | ImageStorage（图片存储+SQLite索引） | [ ] | | |
