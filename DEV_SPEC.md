@@ -1989,7 +1989,7 @@ dashboard:
 | C7 | ImageCaptioner | [x] | 2026-05-28 | ✅ 完成：ImageCaptioner 实现（Vision LLM 增强 + 优雅降级）、图片描述生成、22 个单元测试全通过 |
 | C8 | DenseEncoder | [x] | 2026-05-29 | ✅ 完成：DenseEncoder 实现（批量 embedding + caption 融合）、18 个单元测试全通过 |
 | C9 | SparseEncoder | [x] | 2026-05-29 | ✅ 完成：SparseEncoder 实现（BM25 统计 + 词项权重提取）、21 个单元测试全通过 |
-| C10 | BatchProcessor | [ ] | | |
+| C10 | BatchProcessor | [x] | 2026-05-29 | ✅ 完成：BatchProcessor 实现（批处理编排 + 双路编码）、17 个单元测试全通过 |
 | C11 | BM25Indexer（倒排索引+IDF计算） | [ ] | | |
 | C12 | VectorUpserter（幂等upsert） | [ ] | | |
 | C13 | ImageStorage（图片存储+SQLite索引） | [ ] | | |
@@ -2068,14 +2068,14 @@ dashboard:
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
 | 阶段 B | 16 | 16 | 100% |
-| 阶段 C | 15 | 9 | 60% |
+| 阶段 C | 15 | 10 | 67% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **30** | **44%** |
+| **总计** | **68** | **31** | **46%** |
 
 
 ---
