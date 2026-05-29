@@ -23,9 +23,13 @@ class ChromaStore(BaseVectorStore):
         self.settings = settings
         self.validate_config()
 
-        # Get persist path from settings
+        # Get persist path from settings (handle both dict and object)
         vector_store_config = settings.vector_store or {}
-        self.persist_path = vector_store_config.get("persist_path", "./data/db/chroma")
+        if isinstance(vector_store_config, dict):
+            self.persist_path = vector_store_config.get("persist_path", "./data/db/chroma")
+        else:
+            # Object with attributes
+            self.persist_path = getattr(vector_store_config, "persist_path", "./data/db/chroma")
 
         # Create persist directory if it doesn't exist
         os.makedirs(self.persist_path, exist_ok=True)
@@ -66,8 +70,15 @@ class ChromaStore(BaseVectorStore):
             raise ValueError("vector_store configuration is required")
 
         vector_store_config = self.settings.vector_store
-        if vector_store_config.get("backend") != "chroma":
-            raise ValueError(f"Invalid backend: {vector_store_config.get('backend')}")
+        # Handle both dict and object with backend attribute
+        backend = None
+        if isinstance(vector_store_config, dict):
+            backend = vector_store_config.get("backend")
+        else:
+            backend = getattr(vector_store_config, "backend", None)
+
+        if backend != "chroma":
+            raise ValueError(f"Invalid backend: {backend}")
 
     def upsert(
         self,

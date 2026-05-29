@@ -9,6 +9,7 @@ from typing import List, Optional, Dict
 
 from src.core.types import Chunk
 from src.core.trace.trace_context import TraceContext
+from src.libs.vector_store.base_vector_store import VectorRecord
 
 
 logger = logging.getLogger(__name__)
@@ -49,36 +50,32 @@ class VectorUpserter:
         if not chunks:
             return
 
-        # Generate stable IDs for all chunks
-        ids = []
-        embeddings = []
-        metadatas = []
-
+        # Convert chunks to VectorRecord objects
+        records = []
         for chunk in chunks:
             # Generate deterministic ID
             chunk_id = self._generate_chunk_id(chunk)
-            ids.append(chunk_id)
 
             # Extract dense embedding
             dense_embedding = chunk.metadata.get("dense_embedding")
-            if dense_embedding is not None:
-                embeddings.append(dense_embedding)
-            else:
-                # Skip chunks without embeddings
-                embeddings.append([])
+            if dense_embedding is None:
+                dense_embedding = []
 
             # Prepare metadata for storage
             metadata = self._prepare_metadata(chunk)
-            metadatas.append(metadata)
+
+            # Create VectorRecord
+            record = VectorRecord(
+                id=chunk_id,
+                text=chunk.text,
+                embedding=dense_embedding,
+                metadata=metadata
+            )
+            records.append(record)
 
         # Write to vector store
-        if embeddings:
-            self.vector_store.upsert(
-                ids=ids,
-                embeddings=embeddings,
-                metadatas=metadatas
-            )
-
+        if records:
+            self.vector_store.upsert(records, trace=trace)
             logger.info(f"Upserted {len(chunks)} chunks to vector store")
 
     def _generate_chunk_id(self, chunk: Chunk) -> str:

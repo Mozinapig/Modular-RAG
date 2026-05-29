@@ -169,3 +169,40 @@ class RetrievalResult:
             "text": self.text,
             "metadata": meta
         }
+
+
+@dataclass
+class IngestionResult:
+    """Result from ingestion pipeline execution.
+
+    Attributes:
+        success: Whether ingestion completed successfully
+        document_count: Number of documents processed
+        chunk_count: Total number of chunks generated
+        image_count: Number of images extracted
+        collection: Collection name where data was stored
+        elapsed_ms: Total execution time in milliseconds
+        errors: List of error messages (if any)
+        stages: Dictionary with per-stage statistics
+    """
+    success: bool
+    document_count: int = 0
+    chunk_count: int = 0
+    image_count: int = 0
+    collection: str = "default"
+    elapsed_ms: float = 0.0
+    errors: List[str] = field(default_factory=list)
+    stages: Dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Serialize to dictionary."""
+        return {
+            "success": self.success,
+            "document_count": self.document_count,
+            "chunk_count": self.chunk_count,
+            "image_count": self.image_count,
+            "collection": self.collection,
+            "elapsed_ms": self.elapsed_ms,
+            "errors": self.errors,
+            "stages": self.stages
+        }

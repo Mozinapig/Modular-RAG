@@ -94,9 +94,14 @@ class VectorStoreFactory:
         # Extract provider from settings
         provider = None
 
-        # Check if settings has vector_store dict with backend key
-        if hasattr(settings, 'vector_store') and isinstance(settings.vector_store, dict):
-            provider = settings.vector_store.get('backend') or settings.vector_store.get('provider')
+        # Check if settings has vector_store attribute
+        if hasattr(settings, 'vector_store'):
+            vs_config = settings.vector_store
+            # Handle both dict and object with backend attribute
+            if isinstance(vs_config, dict):
+                provider = vs_config.get('backend') or vs_config.get('provider')
+            elif hasattr(vs_config, 'backend'):
+                provider = vs_config.backend
         elif hasattr(settings, 'provider'):
             # For backward compatibility, also check for direct provider attribute
             provider = settings.provider

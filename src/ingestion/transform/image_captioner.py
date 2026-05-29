@@ -37,7 +37,9 @@ class ImageCaptioner(BaseTransform):
 
         if self.use_llm:
             try:
-                self.vision_llm = LLMFactory().create_vision_llm(settings)
+                # Extract vision_llm settings from main settings object
+                if hasattr(settings, 'vision_llm') and settings.vision_llm:
+                    self.vision_llm = LLMFactory().create_vision_llm(settings.vision_llm)
             except Exception as e:
                 logger.warning(f"Failed to initialize Vision LLM: {e}")
                 self.vision_llm = None
