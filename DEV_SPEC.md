@@ -1993,7 +1993,7 @@ dashboard:
 | C11 | BM25Indexer（倒排索引+IDF计算） | [x] | 2026-05-29 | ✅ 完成：BM25Indexer 实现（倒排索引构建 + IDF 计算 + 持久化）、21 个单元测试全通过 |
 | C12 | VectorUpserter（幂等upsert） | [x] | 2026-05-29 | ✅ 完成：VectorUpserter 实现（确定性 ID 生成 + 幂等 upsert）、24 个单元测试全通过 |
 | C13 | ImageStorage（图片存储+SQLite索引） | [x] | 2026-05-29 | ✅ 完成：ImageStorage 实现（文件存储 + SQLite 映射索引）、25 个单元测试全通过 |
-| C14 | Pipeline 编排（MVP 串起来） | [ ] | | |
+| C14 | Pipeline 编排（MVP 串起来） | [x] | 2026-05-29 | ✅ 完成：IngestionPipeline 完整编排（Load→Split→Transform→Encode→Store）、支持 Progress Callbacks、TraceContext 传播、17 个集成测试全通过 |
 | C15 | 脚本入口 ingest.py | [ ] | | |
 
 #### 阶段 D：Retrieval MVP
@@ -2068,14 +2068,14 @@ dashboard:
 |------|---------|--------|------|
 | 阶段 A | 3 | 3 | 100% |
 | 阶段 B | 16 | 16 | 100% |
-| 阶段 C | 15 | 13 | 87% |
+| 阶段 C | 15 | 14 | 93% |
 | 阶段 D | 7 | 0 | 0% |
 | 阶段 E | 6 | 0 | 0% |
 | 阶段 F | 5 | 0 | 0% |
 | 阶段 G | 6 | 0 | 0% |
 | 阶段 H | 5 | 0 | 0% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **34** | **50%** |
+| **总计** | **68** | **35** | **51%** |
 
 
 ---
@@ -2634,7 +2634,7 @@ dashboard:
 ### C14：Pipeline 编排（MVP 串起来）
 - **目标**：实现 `pipeline.py`：串行执行（integrity→load→split→transform→encode→store），并对失败步骤做清晰异常。
 - **修改文件**：
-  - `src/ingestion/pipeline.py`
+  - `src/ingestion/ingestion_pipeline.py`
   - `tests/integration/test_ingestion_pipeline.py`
 - **测试数据**：
   - **主测试文档**：`tests/fixtures/sample_documents/complex_technical_doc.pdf`
