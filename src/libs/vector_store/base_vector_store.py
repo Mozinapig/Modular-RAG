@@ -64,6 +64,28 @@ class BaseVectorStore(ABC):
         pass
 
     @abstractmethod
+    def get_by_ids(
+        self,
+        ids: List[str],
+        trace: Optional[Any] = None,
+    ) -> List[VectorRecord]:
+        """
+        Get records by IDs.
+
+        Args:
+            ids: List of record IDs to retrieve
+            trace: Optional TraceContext for tracking
+
+        Returns:
+            List of VectorRecord objects matching the IDs (in request order, missing IDs skipped)
+
+        Raises:
+            ValueError: If input validation fails
+            RuntimeError: If retrieval fails
+        """
+        pass
+
+    @abstractmethod
     def validate_config(self) -> None:
         """
         Validate provider configuration.

@@ -337,202 +337,76 @@ class ChromaStore(BaseVectorStore):
         except Exception as e:
             print(f"Warning: Failed to load records: {e}")
 
-
-
-    def _upsert_memory(self, records: List[VectorRecord], trace: Optional[Any]) -> None:
-        """Upsert using in-memory fallback."""
-        for record in records:
-            if not record.id or not record.text or not record.embedding:
-                raise ValueError("Each record must have id, text, and embedding")
-            self._records[record.id] = record
-
-        # Persist to disk
-        self._save_to_disk()
-
-        if trace:
-            trace.record_stage("vector_upsert", method="memory", count=len(records))
-
-    def query(
+    def get_by_ids(
         self,
-        vector: List[float],
-        top_k: int = 10,
-        filters: Optional[Dict[str, Any]] = None,
+        ids: List[str],
         trace: Optional[Any] = None,
     ) -> List[VectorRecord]:
         """
-        Query similar vectors.
+        Get records by IDs.
 
         Args:
-            vector: Query embedding vector
-            top_k: Number of top results to return
-            filters: Optional metadata filters
+            ids: List of record IDs to retrieve
             trace: Optional TraceContext for tracking
 
         Returns:
-            List of similar VectorRecord objects
+            List of VectorRecord objects matching the IDs (in request order, missing IDs skipped)
 
         Raises:
             ValueError: If input validation fails
-            RuntimeError: If query fails
+            RuntimeError: If retrieval fails
         """
-        if not vector:
-            raise ValueError("Query vector cannot be empty")
-
-        if top_k <= 0:
-            raise ValueError("top_k must be greater than 0")
+        if not ids:
+            return []
 
         if self._use_chroma:
-            return self._query_chroma(vector, top_k, filters, trace)
+            return self._get_by_ids_chroma(ids, trace)
         else:
-            return self._query_memory(vector, top_k, filters, trace)
+            return self._get_by_ids_memory(ids, trace)
 
-    def _query_chroma(
+    def _get_by_ids_chroma(
         self,
-        vector: List[float],
-        top_k: int,
-        filters: Optional[Dict[str, Any]],
+        ids: List[str],
         trace: Optional[Any],
     ) -> List[VectorRecord]:
-        """Query using Chroma backend."""
+        """Get records by IDs using Chroma backend."""
         try:
-            where_filter = None
-            if filters:
-                where_filter = self._build_where_filter(filters)
-
-            results = self.collection.query(
-                query_embeddings=[vector],
-                n_results=top_k,
-                where=where_filter,
-                include=["documents", "embeddings", "metadatas", "distances"],
+            results = self.collection.get(
+                ids=ids,
+                include=["documents", "embeddings", "metadatas"],
             )
 
             records = []
-            if results and results["ids"] and len(results["ids"]) > 0:
-                for i, record_id in enumerate(results["ids"][0]):
-                    # Calculate similarity from distance (Chroma returns L2 distance)
-                    distance = results["distances"][0][i] if results.get("distances") else 0
-                    # Convert L2 distance to similarity score: 1 / (1 + distance)
-                    score = 1.0 / (1.0 + distance)
-
+            if results and results["ids"]:
+                for i, record_id in enumerate(results["ids"]):
                     record = VectorRecord(
                         id=record_id,
-                        text=results["documents"][0][i] if results["documents"] else "",
-                        embedding=results["embeddings"][0][i] if results["embeddings"] else vector,
-                        metadata=results["metadatas"][0][i] if results["metadatas"] else {},
-                        score=score,
+                        text=results["documents"][i] if results.get("documents") else "",
+                        embedding=results["embeddings"][i] if results.get("embeddings") else [],
+                        metadata=results["metadatas"][i] if results.get("metadatas") else {},
                     )
                     records.append(record)
 
             if trace:
-                trace.record_stage("vector_query", method="chroma", results_count=len(records))
+                trace.record_stage("vector_get_by_ids", method="chroma", count=len(records))
 
             return records
         except Exception as e:
-            raise RuntimeError(f"Failed to query vectors from Chroma: {str(e)}")
+            raise RuntimeError(f"Failed to get records by IDs from Chroma: {str(e)}")
 
-    def _query_memory(
+    def _get_by_ids_memory(
         self,
-        vector: List[float],
-        top_k: int,
-        filters: Optional[Dict[str, Any]],
+        ids: List[str],
         trace: Optional[Any],
     ) -> List[VectorRecord]:
-        """Query using in-memory fallback."""
-        if not self._records:
-            return []
-
-        def cosine_similarity(v1: List[float], v2: List[float]) -> float:
-            """Calculate cosine similarity."""
-            if len(v1) != len(v2):
-                return 0.0
-            dot = sum(a * b for a, b in zip(v1, v2))
-            norm1 = sum(a * a for a in v1) ** 0.5
-            norm2 = sum(b * b for b in v2) ** 0.5
-            return dot / (norm1 * norm2) if norm1 > 0 and norm2 > 0 else 0.0
-
-        # Calculate similarities
-        similarities = []
-        for record_id, record in self._records.items():
-            sim = cosine_similarity(vector, record.embedding)
-            similarities.append((sim, record))
-
-        # Sort by similarity (descending)
-        similarities.sort(key=lambda x: x[0], reverse=True)
-
-        # Apply filters
-        if filters:
-            similarities = [
-                (sim, rec) for sim, rec in similarities
-                if rec.metadata and all(rec.metadata.get(k) == v for k, v in filters.items())
-            ]
-
-        # Return top_k with scores
-        results = []
-        for sim, rec in similarities[:top_k]:
-            # Create new VectorRecord with score included
-            result_rec = VectorRecord(
-                id=rec.id,
-                text=rec.text,
-                embedding=rec.embedding,
-                metadata=rec.metadata,
-                score=sim,
-            )
-            results.append(result_rec)
+        """Get records by IDs using in-memory fallback."""
+        records = []
+        for record_id in ids:
+            if record_id in self._records:
+                records.append(self._records[record_id])
 
         if trace:
-            trace.record_stage("vector_query", method="memory", results_count=len(results))
+            trace.record_stage("vector_get_by_ids", method="memory", count=len(records))
 
-        return results
-
-    def _build_where_filter(self, filters: Dict[str, Any]) -> Dict[str, Any]:
-        """Build Chroma where filter."""
-        if not filters:
-            return None
-
-        conditions = []
-        for key, value in filters.items():
-            conditions.append({key: {"$eq": value}})
-
-        if len(conditions) == 1:
-            return conditions[0]
-        elif len(conditions) > 1:
-            return {"$and": conditions}
-        return None
-
-    def _save_to_disk(self) -> None:
-        """Save records to disk (JSON Lines format)."""
-        try:
-            with open(self.records_file, "w") as f:
-                for record_id, record in self._records.items():
-                    obj = {
-                        "id": record.id,
-                        "text": record.text,
-                        "embedding": record.embedding,
-                        "metadata": record.metadata,
-                    }
-                    f.write(json.dumps(obj) + "\n")
-        except Exception as e:
-            print(f"Warning: Failed to persist records: {e}")
-
-    def _load_from_disk(self) -> None:
-        """Load records from disk."""
-        if not self.records_file.exists():
-            return
-
-        try:
-            with open(self.records_file, "r") as f:
-                for line in f:
-                    if line.strip():
-                        obj = json.loads(line)
-                        record = VectorRecord(
-                            id=obj["id"],
-                            text=obj["text"],
-                            embedding=obj["embedding"],
-                            metadata=obj.get("metadata"),
-                        )
-                        self._records[record.id] = record
-        except Exception as e:
-            print(f"Warning: Failed to load records: {e}")
-
-
+        return records
 
