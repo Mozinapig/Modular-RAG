@@ -206,16 +206,23 @@ class ChromaStore(BaseVectorStore):
                 query_embeddings=[vector],
                 n_results=top_k,
                 where=where_filter,
+                include=["documents", "embeddings", "metadatas", "distances"],
             )
 
             records = []
             if results and results["ids"] and len(results["ids"]) > 0:
                 for i, record_id in enumerate(results["ids"][0]):
+                    # Calculate similarity from distance (Chroma returns L2 distance)
+                    distance = results["distances"][0][i] if results.get("distances") else 0
+                    # Convert L2 distance to similarity score: 1 / (1 + distance)
+                    score = 1.0 / (1.0 + distance)
+
                     record = VectorRecord(
                         id=record_id,
                         text=results["documents"][0][i] if results["documents"] else "",
                         embedding=results["embeddings"][0][i] if results["embeddings"] else vector,
                         metadata=results["metadatas"][0][i] if results["metadatas"] else {},
+                        score=score,
                     )
                     records.append(record)
 
@@ -262,8 +269,18 @@ class ChromaStore(BaseVectorStore):
                 if rec.metadata and all(rec.metadata.get(k) == v for k, v in filters.items())
             ]
 
-        # Return top_k
-        results = [rec for _, rec in similarities[:top_k]]
+        # Return top_k with scores
+        results = []
+        for sim, rec in similarities[:top_k]:
+            # Create new VectorRecord with score included
+            result_rec = VectorRecord(
+                id=rec.id,
+                text=rec.text,
+                embedding=rec.embedding,
+                metadata=rec.metadata,
+                score=sim,
+            )
+            results.append(result_rec)
 
         if trace:
             trace.record_stage("vector_query", method="memory", results_count=len(results))
@@ -386,16 +403,23 @@ class ChromaStore(BaseVectorStore):
                 query_embeddings=[vector],
                 n_results=top_k,
                 where=where_filter,
+                include=["documents", "embeddings", "metadatas", "distances"],
             )
 
             records = []
             if results and results["ids"] and len(results["ids"]) > 0:
                 for i, record_id in enumerate(results["ids"][0]):
+                    # Calculate similarity from distance (Chroma returns L2 distance)
+                    distance = results["distances"][0][i] if results.get("distances") else 0
+                    # Convert L2 distance to similarity score: 1 / (1 + distance)
+                    score = 1.0 / (1.0 + distance)
+
                     record = VectorRecord(
                         id=record_id,
                         text=results["documents"][0][i] if results["documents"] else "",
                         embedding=results["embeddings"][0][i] if results["embeddings"] else vector,
                         metadata=results["metadatas"][0][i] if results["metadatas"] else {},
+                        score=score,
                     )
                     records.append(record)
 
@@ -442,8 +466,18 @@ class ChromaStore(BaseVectorStore):
                 if rec.metadata and all(rec.metadata.get(k) == v for k, v in filters.items())
             ]
 
-        # Return top_k
-        results = [rec for _, rec in similarities[:top_k]]
+        # Return top_k with scores
+        results = []
+        for sim, rec in similarities[:top_k]:
+            # Create new VectorRecord with score included
+            result_rec = VectorRecord(
+                id=rec.id,
+                text=rec.text,
+                embedding=rec.embedding,
+                metadata=rec.metadata,
+                score=sim,
+            )
+            results.append(result_rec)
 
         if trace:
             trace.record_stage("vector_query", method="memory", results_count=len(results))

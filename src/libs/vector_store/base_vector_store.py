@@ -12,6 +12,7 @@ class VectorRecord:
     text: str
     embedding: List[float]
     metadata: Optional[Dict[str, Any]] = None
+    score: Optional[float] = None  # Similarity/relevance score from query
 
 
 class BaseVectorStore(ABC):
