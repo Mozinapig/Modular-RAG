@@ -255,9 +255,15 @@ def main():
         if args.verbose:
             print_results(results, verbose=True, stage_name="HybridSearch")
 
-        # Apply reranking if enabled
-        if not args.no_rerank and results:
-            logger.info("Applying reranker...")
+        # Apply reranking if enabled (unless explicitly disabled or backend is "none")
+        should_rerank = (
+            not args.no_rerank  # User didn't explicitly disable reranking
+            and results  # Have results to rerank
+            and settings.rerank.backend != "none"  # Config says to enable reranking
+        )
+
+        if should_rerank:
+            logger.info(f"Applying reranker (backend: {settings.rerank.backend})...")
             reranker = CoreReranker(settings)
             results = reranker.rerank(
                 query=args.query,

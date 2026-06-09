@@ -50,7 +50,7 @@ class CoreReranker:
         # Initialize backend if not "none"
         if self.settings.rerank.backend != "none":
             try:
-                self.reranker = RerankerFactory.create(settings)
+                self.reranker = RerankerFactory().create(self.settings.rerank)
             except Exception as e:
                 # Log initialization error but continue (fallback will be used)
                 self._initialization_error = str(e)
@@ -180,9 +180,15 @@ class CoreReranker:
         """
         results = []
         for item in results_dict:
+            # Use cross_encoder_score if available (from reranker), otherwise use original score
+            if "cross_encoder_score" in item:
+                score = item["cross_encoder_score"]
+            else:
+                score = item.get("score", 0.0)
+
             result = RetrievalResult(
                 chunk_id=item.get("id") or item.get("chunk_id"),
-                score=item.get("score", 0.0),
+                score=score,
                 text=item.get("text", ""),
                 metadata=item.get("metadata", {}),
             )

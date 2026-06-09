@@ -107,9 +107,15 @@ class CrossEncoderReranker(BaseReranker):
 
     def _get_model_name(self) -> str:
         """Extract model name from settings."""
-        if isinstance(self.settings.rerank, dict):
-            return self.settings.rerank.get("model", "unknown")
-        return getattr(self.settings.rerank, "model", "unknown")
+        # Handle both full Settings object and RerankerSettings object
+        if hasattr(self.settings, "rerank"):
+            # This is a full Settings object
+            return self.settings.rerank.get("model", "unknown") if isinstance(self.settings.rerank, dict) else getattr(self.settings.rerank, "model", "unknown")
+        elif hasattr(self.settings, "model"):
+            # This is already RerankerSettings
+            return getattr(self.settings, "model", "unknown")
+        else:
+            return "unknown"
 
     def _validate_inputs(self, query: str, candidates: List[Dict[str, Any]]) -> None:
         """Validate input query and candidates."""
@@ -146,6 +152,7 @@ class CrossEncoderReranker(BaseReranker):
         # Check for required API fields
         api_key = reranker_config.get("api_key") if isinstance(reranker_config, dict) else getattr(reranker_config, "api_key", None)
         base_url = reranker_config.get("base_url") if isinstance(reranker_config, dict) else getattr(reranker_config, "base_url", None)
+        model = reranker_config.get("model") if isinstance(reranker_config, dict) else getattr(reranker_config, "model", None)
 
         if not api_key or not base_url:
             raise ValueError(
@@ -154,11 +161,15 @@ class CrossEncoderReranker(BaseReranker):
             )
 
         # Prepare request data for BGE Reranker API
-        # Typical format: {"query": "...", "passages": ["...", "..."]}
+        # Try format: {"model": "bge-reranker-v2-m3", "query": "...", "documents": ["...", ...]}
         request_data = {
             "query": query,
-            "passages": texts,
+            "documents": texts,
         }
+
+        # Add model name if provided (required by BGE API)
+        if model:
+            request_data["model"] = model
 
         headers = {
             "Authorization": f"Bearer {api_key}",
@@ -179,7 +190,12 @@ class CrossEncoderReranker(BaseReranker):
             result = response.json()
 
             # Expected format: {"results": [{"index": 0, "score": 0.9}, ...]}
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.debug(f"Reranker API response: {result}")
+
             if "results" not in result:
+                logger.error(f"Unexpected API response format. Got: {result}")
                 raise ValueError(
                     f"Unexpected API response format. Expected 'results' field. Got: {result}"
                 )
@@ -188,10 +204,10 @@ class CrossEncoderReranker(BaseReranker):
             scores_by_index = {}
             for item in result["results"]:
                 idx = item.get("index")
-                score = item.get("score")
+                score = item.get("relevance_score") or item.get("score")
                 if idx is None or score is None:
                     raise ValueError(
-                        f"Invalid result item format. Expected 'index' and 'score'. Got: {item}"
+                        f"Invalid result item format. Expected 'index' and 'relevance_score'/'score'. Got: {item}"
                     )
                 scores_by_index[idx] = float(score)
 

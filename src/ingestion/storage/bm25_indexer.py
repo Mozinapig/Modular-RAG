@@ -231,17 +231,21 @@ class BM25Indexer:
         Load index from JSON file.
 
         Args:
-            path: File path to load from
+            path: File path or directory path to load from (if directory, loads default.json)
             trace: Optional trace context for tracking
         """
         path = Path(path)
+
+        # If path is directory, load default.json from it
+        if path.is_dir():
+            path = path / "default.json"
 
         if not path.exists():
             logger.warning(f"Index file not found: {path}")
             self.index = {}
             return
 
-        with open(path, "r") as f:
+        with open(path, "r", encoding="utf-8") as f:
             loaded_index = json.load(f)
 
         self.index = loaded_index
