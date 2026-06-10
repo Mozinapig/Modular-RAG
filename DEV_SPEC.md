@@ -2012,12 +2012,12 @@ dashboard:
 
 | 任务编号 | 任务名称 | 状态 | 完成日期 | 备注 |
 |---------|---------|------|---------|------|
-| E1 | MCP Server 入口与 Stdio 约束 | [ ] | | |
-| E2 | Protocol Handler 协议解析与能力协商 | [ ] | | |
-| E3 | query_knowledge_hub Tool | [ ] | | |
-| E4 | list_collections Tool | [ ] | | |
-| E5 | get_document_summary Tool | [ ] | | |
-| E6 | 多模态返回组装（Text + Image） | [ ] | | |
+| E1 | MCP Server 入口与 Stdio 约束 | [x] | 2026-06-10 | ✅ 完成：Stdio transport、stderr/stdout分离、21个集成测试全通过 |
+| E2 | Protocol Handler 协议解析与能力协商 | [x] | 2026-06-10 | ✅ 完成：JSON-RPC 2.0、initialize/tools/list/call、错误码规范、不泄露堆栈、16个单元测试全通过 |
+| E3 | query_knowledge_hub Tool | [x] | 2026-06-10 | ✅ 完成：HybridSearch调用、Reranker可选、ResponseBuilder、CitationGenerator、12个单元+集成测试全通过 |
+| E4 | list_collections Tool | [x] | 2026-06-10 | ✅ 完成：集合枚举、文件统计、结构化返回、5个单元测试全通过 |
+| E5 | get_document_summary Tool | [x] | 2026-06-10 | ✅ 完成：doc_id查询、元数据提取、结构化摘要、4个单元测试全通过 |
+| E6 | 多模态返回组装（Text + Image） | [x] | 2026-06-10 | ✅ 完成：MultimodalAssembler、Base64编码、MIME类型推导、12个单元测试全通过 |
 
 #### 阶段 F：Trace 基础设施与打点
 
