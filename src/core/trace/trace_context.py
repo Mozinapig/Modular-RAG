@@ -87,13 +87,56 @@ class TraceContext:
         """Mark trace as finished."""
         self.end_time = datetime.now().timestamp()
 
+    def elapsed_ms(self, stage_name: Optional[str] = None) -> float:
+        """
+        Get elapsed time in milliseconds.
+
+        Args:
+            stage_name: If provided, return elapsed time for that specific stage.
+                       If None, return total elapsed time.
+
+        Returns:
+            Elapsed time in milliseconds
+        """
+        if stage_name:
+            # Find the stage and return its duration
+            for stage in self.stages:
+                if stage.stage_name == stage_name:
+                    return stage.duration_ms if stage.duration_ms is not None else 0
+            return 0
+
+        # Return total elapsed time
+        if self.stages:
+            # Calculate from start_time to the end of last stage
+            last_stage = max(self.stages, key=lambda s: s.end_time if s.end_time else 0)
+            end_time = last_stage.end_time if last_stage.end_time else datetime.now().timestamp()
+            return (end_time - self.start_time) * 1000
+
+        if self.end_time is None:
+            # If not finished, calculate from now
+            current_time = datetime.now().timestamp()
+            return (current_time - self.start_time) * 1000
+
+        return (self.end_time - self.start_time) * 1000
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
+        # Calculate total elapsed time based on stages if available
+        if self.stages:
+            last_stage = max(self.stages, key=lambda s: s.end_time if s.end_time else 0)
+            end_time = last_stage.end_time if last_stage.end_time else self.end_time
+            total_elapsed_ms = (end_time - self.start_time) * 1000
+        elif self.end_time:
+            total_elapsed_ms = (self.end_time - self.start_time) * 1000
+        else:
+            total_elapsed_ms = (datetime.now().timestamp() - self.start_time) * 1000
+
         return {
             "trace_id": self.trace_id,
             "trace_type": self.trace_type,
-            "start_time": self.start_time,
-            "end_time": self.end_time,
+            "started_at": self.start_time,
+            "finished_at": self.end_time,
+            "total_elapsed_ms": total_elapsed_ms,
             "stages": [s.to_dict() for s in self.stages],
             "metadata": self.metadata
         }
