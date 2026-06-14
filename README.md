@@ -1,4 +1,5 @@
 # Modular RAG System
+- 模块化RAG - MCP Server
 
 A modular, pluggable RAG (Retrieval-Augmented Generation) system with MCP (Model Context Protocol) server support.
 
