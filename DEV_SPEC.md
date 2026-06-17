@@ -2027,7 +2027,7 @@ dashboard:
 | F2 | 结构化日志 logger（JSON Lines） | [x] | 2026-06-17 | ✅ 完成：JSONFormatter实现、JSON Lines写入、17个单元测试全通过 |
 | F3 | 在 Query 链路打点 | [x] | 2026-06-17 | ✅ 完成：HybridSearch/DenseRetriever/SparseRetriever添加trace记录、12个单元测试全通过 |
 | F4 | 在 Ingestion 链路打点 | [x] | 2026-06-17 | ✅ 完成：在Pipeline各阶段记录trace、支持finish()、4个集成测试全通过 |
-| F5 | Pipeline 进度回调 (on_progress) | [ ] | | |
+| F5 | Pipeline 进度回调 (on_progress) | [x] | 2026-06-17 | ✅ 完成：支持on_progress参数、各阶段前后进度回调、7个单元测试全通过 |
 
 #### 阶段 G：可视化管理平台 Dashboard
 
