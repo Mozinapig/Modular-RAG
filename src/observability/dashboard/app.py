@@ -69,7 +69,8 @@ def main():
         from src.observability.dashboard.pages.overview import show_overview
         show_overview(settings)
     elif page_key == "pages/data_browser":
-        st.info("📚 Data Browser page - Coming soon")
+        from src.observability.dashboard.pages.data_browser import show_page
+        show_page(settings)
     elif page_key == "pages/ingestion_manager":
         st.info("📤 Ingestion Manager page - Coming soon")
     elif page_key == "pages/ingestion_traces":
