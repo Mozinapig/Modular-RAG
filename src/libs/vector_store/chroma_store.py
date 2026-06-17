@@ -468,3 +468,85 @@ class ChromaStore(BaseVectorStore):
                 "total_images": 0,
             }
 
+    def delete_by_metadata(self, metadata_filter: Dict[str, Any]) -> int:
+        """
+        Delete records matching metadata filter.
+
+        Args:
+            metadata_filter: Dictionary of metadata filters
+
+        Returns:
+            Number of deleted records
+        """
+        try:
+            # Delete from memory storage
+            deleted_ids = []
+            for record_id, record in list(self._records.items()):
+                match = True
+                if metadata_filter:
+                    for key, value in metadata_filter.items():
+                        if record.metadata.get(key) != value:
+                            match = False
+                            break
+
+                if match:
+                    deleted_ids.append(record_id)
+                    del self._records[record_id]
+
+            # Persist changes
+            self._save_to_disk()
+
+            return len(deleted_ids)
+        except Exception as e:
+            raise RuntimeError(f"Failed to delete records from Chroma: {str(e)}")
+
+    def get_by_metadata(self, metadata_filter: Dict[str, Any] = None) -> List[Dict[str, Any]]:
+        """
+        Get records by metadata filter.
+
+        Args:
+            metadata_filter: Dictionary of metadata filters
+
+        Returns:
+            List of matching records
+        """
+        try:
+            results = []
+
+            for record in self._records.values():
+                if not metadata_filter:
+                    results.append(self._record_to_dict(record))
+                    continue
+
+                match = True
+                for key, value in metadata_filter.items():
+                    if record.metadata.get(key) != value:
+                        match = False
+                        break
+
+                if match:
+                    results.append(self._record_to_dict(record))
+
+            return results
+        except Exception as e:
+            raise RuntimeError(f"Failed to query records from Chroma: {str(e)}")
+
+    def _record_to_dict(self, record: VectorRecord) -> Dict[str, Any]:
+        """Convert VectorRecord to dictionary."""
+        return {
+            "id": record.id,
+            "text": record.text,
+            "metadata": record.metadata or {},
+            "dense_vector": record.dense_vector,
+            "sparse_vector": record.sparse_vector,
+        }
+
+    def _save_to_disk(self) -> None:
+        """Save records to disk."""
+        try:
+            with open(self.records_file, "w", encoding="utf-8") as f:
+                for record in self._records.values():
+                    record_dict = self._record_to_dict(record)
+                    f.write(json.dumps(record_dict, ensure_ascii=False) + "\n")
+        except Exception as e:
+            print(f"Warning: Failed to save records to disk: {e}")
