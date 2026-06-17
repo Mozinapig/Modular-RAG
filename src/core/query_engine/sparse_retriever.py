@@ -1,6 +1,7 @@
 """SparseRetriever: BM25-based retrieval using inverted index."""
 
 from typing import List, Dict, Optional, Any
+from datetime import datetime
 
 from src.core.types import RetrievalResult
 from src.core.settings import Settings
@@ -61,6 +62,9 @@ class SparseRetriever:
         if not keywords:
             return []
 
+        # Record start time for tracing
+        sr_start = datetime.now().timestamp() if trace else None
+
         # Collect results from all keywords
         results_by_chunk_id: Dict[str, Dict] = {}
 
@@ -93,6 +97,16 @@ class SparseRetriever:
                     )
 
         if not results_by_chunk_id:
+            if trace:
+                sr_end = datetime.now().timestamp()
+                trace.record_stage(
+                    "sparse_retrieval",
+                    start_time=sr_start,
+                    end_time=sr_end,
+                    method="bm25",
+                    keywords_count=len(keywords),
+                    candidates_count=0
+                )
             return []
 
         # Sort by score (descending) and take top_k
@@ -108,6 +122,16 @@ class SparseRetriever:
 
         # Fetch full text and metadata from vector store
         if not self.vector_store:
+            if trace:
+                sr_end = datetime.now().timestamp()
+                trace.record_stage(
+                    "sparse_retrieval",
+                    start_time=sr_start,
+                    end_time=sr_end,
+                    method="bm25",
+                    keywords_count=len(keywords),
+                    candidates_count=len(chunk_ids)
+                )
             return []
 
         vector_records = self.vector_store.get_by_ids(
@@ -125,5 +149,17 @@ class SparseRetriever:
                 metadata=record.metadata or {},
             )
             retrieval_results.append(result)
+
+        # Record completion with trace
+        if trace:
+            sr_end = datetime.now().timestamp()
+            trace.record_stage(
+                "sparse_retrieval",
+                start_time=sr_start,
+                end_time=sr_end,
+                method="bm25",
+                keywords_count=len(keywords),
+                candidates_count=len(retrieval_results)
+            )
 
         return retrieval_results

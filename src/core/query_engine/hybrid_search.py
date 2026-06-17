@@ -11,6 +11,7 @@ Workflow:
 
 from typing import List, Optional, Dict, Any
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime
 
 from src.core.types import RetrievalResult
 from src.core.query_engine.query_processor import QueryProcessor
@@ -70,8 +71,21 @@ class HybridSearch:
         if not query or not query.strip():
             return []
 
+        # Record query_processing stage
+        qp_start = datetime.now().timestamp() if trace else None
+
         # Process query to extract keywords and filters
         processed_query = self.query_processor.process(query)
+
+        if trace:
+            qp_end = datetime.now().timestamp()
+            trace.record_stage(
+                "query_processing",
+                start_time=qp_start,
+                end_time=qp_end,
+                method="keyword_extraction",
+                keywords_count=len(processed_query.keywords) if processed_query.keywords else 0
+            )
 
         # Run dense and sparse retrieval in parallel
         dense_results = []
@@ -127,8 +141,23 @@ class HybridSearch:
             except Exception:
                 sparse_results = []
 
+        # Record fusion stage
+        fusion_start = datetime.now().timestamp() if trace else None
+
         # Fuse results from both sources
         fused_results = self.fusion.fuse(dense_results, sparse_results)
+
+        if trace:
+            fusion_end = datetime.now().timestamp()
+            trace.record_stage(
+                "fusion",
+                start_time=fusion_start,
+                end_time=fusion_end,
+                algorithm="rrf",
+                dense_candidates=len(dense_results),
+                sparse_candidates=len(sparse_results),
+                fused_candidates=len(fused_results)
+            )
 
         # Apply metadata filters if provided
         if filters:

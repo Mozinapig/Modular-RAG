@@ -1,5 +1,6 @@
 """Dense retriever implementation."""
 from typing import Optional, Dict, Any, List
+from datetime import datetime
 from src.core.types import RetrievalResult
 from src.libs.vector_store.base_vector_store import BaseVectorStore
 
@@ -47,6 +48,9 @@ class DenseRetriever:
         if not query or not query.strip():
             return []
 
+        # Record start time for tracing
+        dr_start = datetime.now().timestamp() if trace else None
+
         try:
             # Generate query embedding
             query_vector = self.embedding_client.embed([query])[0]
@@ -71,10 +75,14 @@ class DenseRetriever:
                 results.append(result)
 
             if trace:
+                dr_end = datetime.now().timestamp()
                 trace.record_stage(
                     "dense_retrieval",
+                    start_time=dr_start,
+                    end_time=dr_end,
                     method="embedding",
-                    results_count=len(results),
+                    provider="openai",
+                    candidates_count=len(results),
                 )
 
             return results
