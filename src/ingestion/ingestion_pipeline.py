@@ -139,6 +139,8 @@ class IngestionPipeline:
             if on_progress:
                 on_progress("load", 0, 1)
 
+            load_start = time.time() if trace else None
+
             try:
                 document = self._load_document(source_path, trace=trace)
             except Exception as e:
@@ -147,6 +149,15 @@ class IngestionPipeline:
                 result.errors.append(error_msg)
                 result.elapsed_ms = (time.time() - start_time) * 1000
                 return result
+
+            if trace and load_start:
+                trace.record_stage(
+                    "load",
+                    start_time=load_start,
+                    end_time=time.time(),
+                    method="markitdown",
+                    file_path=source_path
+                )
 
             if on_progress:
                 on_progress("load", 1, 1)
@@ -157,6 +168,8 @@ class IngestionPipeline:
             if on_progress:
                 on_progress("split", 0, 1)
 
+            split_start = time.time() if trace else None
+
             try:
                 chunks = self._chunk_document(document, trace=trace)
             except Exception as e:
@@ -165,6 +178,15 @@ class IngestionPipeline:
                 result.errors.append(error_msg)
                 result.elapsed_ms = (time.time() - start_time) * 1000
                 return result
+
+            if trace and split_start:
+                trace.record_stage(
+                    "split",
+                    start_time=split_start,
+                    end_time=time.time(),
+                    method="recursive",
+                    chunk_count=len(chunks)
+                )
 
             if on_progress:
                 on_progress("split", 1, 1)
@@ -175,6 +197,8 @@ class IngestionPipeline:
             if on_progress:
                 on_progress("transform", 0, 1)
 
+            transform_start = time.time() if trace else None
+
             try:
                 chunks = self._transform_chunks(chunks, trace=trace)
             except Exception as e:
@@ -184,12 +208,23 @@ class IngestionPipeline:
                 result.elapsed_ms = (time.time() - start_time) * 1000
                 return result
 
+            if trace and transform_start:
+                trace.record_stage(
+                    "transform",
+                    start_time=transform_start,
+                    end_time=time.time(),
+                    method="refinement_enrichment",
+                    refined_count=len(chunks)
+                )
+
             if on_progress:
                 on_progress("transform", 1, 1)
 
             # Encode chunks
             if on_progress:
                 on_progress("encode", 0, 1)
+
+            embed_start = time.time() if trace else None
 
             try:
                 chunks = self._encode_chunks(chunks, trace=trace)
@@ -200,12 +235,23 @@ class IngestionPipeline:
                 result.elapsed_ms = (time.time() - start_time) * 1000
                 return result
 
+            if trace and embed_start:
+                trace.record_stage(
+                    "embed",
+                    start_time=embed_start,
+                    end_time=time.time(),
+                    method="dense_sparse",
+                    encoded_count=len(chunks)
+                )
+
             if on_progress:
                 on_progress("encode", 1, 1)
 
             # Store chunks and metadata
             if on_progress:
                 on_progress("store", 0, 1)
+
+            store_start = time.time() if trace else None
 
             try:
                 self._store_chunks(chunks, collection, trace=trace)
@@ -219,11 +265,23 @@ class IngestionPipeline:
                 result.elapsed_ms = (time.time() - start_time) * 1000
                 return result
 
+            if trace and store_start:
+                trace.record_stage(
+                    "upsert",
+                    start_time=store_start,
+                    end_time=time.time(),
+                    method="chroma_bm25",
+                    stored_count=len(chunks)
+                )
+
             if on_progress:
                 on_progress("store", 1, 1)
 
             result.success = True
             result.elapsed_ms = (time.time() - start_time) * 1000
+
+            if trace:
+                trace.finish()
 
             logger.info(
                 f"Successfully ingested document from {source_path}: "
