@@ -1,0 +1,2 @@
+{"timestamp": "2026-06-17T09:01:28.848050", "level": "INFO", "logger": "trace_logger", "message": "Test message", "taskName": null, "trace_id": "test_001"}
+{"timestamp": "2026-06-17T09:01:29.096964", "level": "WARNING", "logger": "trace_logger", "message": "Warning message", "taskName": null}
