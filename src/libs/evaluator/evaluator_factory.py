@@ -127,3 +127,18 @@ class EvaluatorFactory:
             List of provider names (lowercase)
         """
         return list(cls._providers.keys())
+
+
+# Lazy registration of RagasEvaluator to avoid hard dependency
+def _register_ragas():
+    """Register RagasEvaluator if ragas library is available."""
+    try:
+        from src.observability.evaluation.ragas_evaluator import RagasEvaluator
+        EvaluatorFactory.register_provider("ragas", RagasEvaluator)
+    except ImportError:
+        # ragas not installed, skip registration
+        pass
+
+
+# Register ragas provider on module load
+_register_ragas()
