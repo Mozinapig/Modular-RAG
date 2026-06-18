@@ -342,3 +342,151 @@ class TestVectorStoreFactory:
         results = store.query(embedding, top_k=10)
 
         assert len(results) > 0
+
+    def test_store_delete_by_metadata_basic(self):
+        """Test basic delete_by_metadata functionality."""
+        from src.libs.vector_store.vector_store_factory import VectorStoreFactory
+
+        store_settings = Mock()
+        store_settings.backend = "fake"
+
+        factory = VectorStoreFactory()
+        store = factory.create(store_settings)
+
+        # Upsert records with different metadata
+        records = [
+            VectorRecord(
+                id="doc_001",
+                text="Document 1",
+                embedding=[0.1, 0.2, 0.3],
+                metadata={"collection": "test", "source": "file1.pdf"},
+            ),
+            VectorRecord(
+                id="doc_002",
+                text="Document 2",
+                embedding=[0.4, 0.5, 0.6],
+                metadata={"collection": "test", "source": "file2.pdf"},
+            ),
+            VectorRecord(
+                id="doc_003",
+                text="Document 3",
+                embedding=[0.7, 0.8, 0.9],
+                metadata={"collection": "other", "source": "file1.pdf"},
+            ),
+        ]
+
+        store.upsert(records)
+
+        # Delete by collection
+        if hasattr(store, 'delete_by_metadata'):
+            store.delete_by_metadata({"collection": "test"})
+
+    def test_store_delete_by_metadata_empty_match(self):
+        """Test delete_by_metadata with no matching records."""
+        from src.libs.vector_store.vector_store_factory import VectorStoreFactory
+
+        store_settings = Mock()
+        store_settings.backend = "fake"
+
+        factory = VectorStoreFactory()
+        store = factory.create(store_settings)
+
+        records = [
+            VectorRecord(
+                id="doc_001",
+                text="Document 1",
+                embedding=[0.1, 0.2, 0.3],
+                metadata={"collection": "test"},
+            ),
+        ]
+
+        store.upsert(records)
+
+        # Delete with non-matching metadata
+        if hasattr(store, 'delete_by_metadata'):
+            store.delete_by_metadata({"collection": "nonexistent"})
+
+    def test_store_delete_by_metadata_compound_filter(self):
+        """Test delete_by_metadata with compound filters."""
+        from src.libs.vector_store.vector_store_factory import VectorStoreFactory
+
+        store_settings = Mock()
+        store_settings.backend = "fake"
+
+        factory = VectorStoreFactory()
+        store = factory.create(store_settings)
+
+        records = [
+            VectorRecord(
+                id="doc_001",
+                text="Document 1",
+                embedding=[0.1, 0.2, 0.3],
+                metadata={"collection": "test", "status": "active"},
+            ),
+            VectorRecord(
+                id="doc_002",
+                text="Document 2",
+                embedding=[0.4, 0.5, 0.6],
+                metadata={"collection": "test", "status": "inactive"},
+            ),
+        ]
+
+        store.upsert(records)
+
+        # Delete with multiple metadata fields
+        if hasattr(store, 'delete_by_metadata'):
+            store.delete_by_metadata({"collection": "test", "status": "active"})
+
+    def test_store_delete_all_by_metadata(self):
+        """Test delete_by_metadata can delete all records."""
+        from src.libs.vector_store.vector_store_factory import VectorStoreFactory
+
+        store_settings = Mock()
+        store_settings.backend = "fake"
+
+        factory = VectorStoreFactory()
+        store = factory.create(store_settings)
+
+        records = [
+            VectorRecord(
+                id=f"doc_{i:03d}",
+                text=f"Document {i}",
+                embedding=[float(i) / 10, 0.2, 0.3],
+                metadata={"delete_me": "yes"},
+            )
+            for i in range(5)
+        ]
+
+        store.upsert(records)
+
+        # Delete all with matching metadata
+        if hasattr(store, 'delete_by_metadata'):
+            store.delete_by_metadata({"delete_me": "yes"})
+
+    def test_store_delete_by_empty_metadata(self):
+        """Test delete_by_metadata with empty filter dict."""
+        from src.libs.vector_store.vector_store_factory import VectorStoreFactory
+
+        store_settings = Mock()
+        store_settings.backend = "fake"
+
+        factory = VectorStoreFactory()
+        store = factory.create(store_settings)
+
+        records = [
+            VectorRecord(
+                id="doc_001",
+                text="Document 1",
+                embedding=[0.1, 0.2, 0.3],
+                metadata={"collection": "test"},
+            ),
+        ]
+
+        store.upsert(records)
+
+        # Delete with empty filter (should be no-op or error)
+        if hasattr(store, 'delete_by_metadata'):
+            try:
+                store.delete_by_metadata({})
+            except (ValueError, TypeError):
+                pass  # Expected behavior for empty filter

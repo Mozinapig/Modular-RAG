@@ -166,3 +166,98 @@ class TestRerankerFactory:
         # Should have at least 'none' provider
         assert "none" in factory._providers
         assert NoneReranker == factory._providers["none"]
+
+    def test_none_reranker_large_candidate_list(self):
+        """Test NoneReranker handles large candidate lists."""
+        settings = Mock()
+        reranker = NoneReranker(settings)
+
+        # Large candidate list
+        candidates = [
+            {"id": f"doc_{i}", "text": f"Document {i}", "score": 0.9 - (i * 0.01)}
+            for i in range(1000)
+        ]
+
+        result = reranker.rerank("test query", candidates)
+
+        assert len(result) == 1000
+        assert result[0]["id"] == "doc_0"
+        assert result[-1]["id"] == "doc_999"
+
+    def test_none_reranker_with_complex_candidate_structure(self):
+        """Test NoneReranker preserves complex candidate structures."""
+        settings = Mock()
+        reranker = NoneReranker(settings)
+
+        candidates = [
+            {
+                "id": "1",
+                "text": "Complex document",
+                "score": 0.9,
+                "metadata": {"source": "file1.pdf", "page": 1},
+                "embedding": [0.1, 0.2, 0.3],
+                "nested": {"key": "value"},
+            },
+            {
+                "id": "2",
+                "text": "Another document",
+                "score": 0.7,
+                "metadata": {"source": "file2.pdf", "page": 5},
+            },
+        ]
+
+        result = reranker.rerank("query", candidates)
+
+        # All fields should be preserved
+        assert result[0]["metadata"]["source"] == "file1.pdf"
+        assert result[0]["nested"]["key"] == "value"
+        assert result[1]["metadata"]["page"] == 5
+
+    def test_none_reranker_with_missing_score_field(self):
+        """Test NoneReranker handles candidates without score field."""
+        settings = Mock()
+        reranker = NoneReranker(settings)
+
+        candidates = [
+            {"id": "1", "text": "First"},
+            {"id": "2", "text": "Second", "score": 0.8},
+        ]
+
+        result = reranker.rerank("query", candidates)
+
+        assert len(result) == 2
+        assert result[0]["id"] == "1"
+
+    def test_factory_empty_provider_name(self):
+        """Test factory rejects empty provider name."""
+        settings = Mock()
+        settings.provider = ""
+
+        factory = RerankerFactory()
+
+        with pytest.raises(ValueError):
+            factory.create(settings)
+
+    def test_none_reranker_whitespace_query(self):
+        """Test NoneReranker handles whitespace-only queries."""
+        settings = Mock()
+        reranker = NoneReranker(settings)
+
+        candidates = [{"id": "1", "text": "Document"}]
+
+        # Should handle various query formats
+        result = reranker.rerank("   ", candidates)
+        assert len(result) == 1
+
+        result = reranker.rerank("\t\n", candidates)
+        assert len(result) == 1
+
+    def test_factory_special_character_provider_name(self):
+        """Test factory handles special characters in provider names."""
+        settings = Mock()
+        settings.provider = "none@provider#test"
+
+        factory = RerankerFactory()
+
+        with pytest.raises(ValueError):
+            factory.create(settings)

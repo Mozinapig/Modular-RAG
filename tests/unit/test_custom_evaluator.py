@@ -204,3 +204,88 @@ class TestEvaluatorFactory:
         evaluator = factory.create(evaluator_settings)
         # If validate_config raised error, this would fail during creation
         assert evaluator is not None
+
+    def test_evaluate_large_retrieved_list(self, custom_evaluator):
+        """Test evaluation with large retrieved candidate list."""
+        query = "large query"
+        retrieved_ids = [f"chunk_{i}" for i in range(1000)]
+        golden_ids = ["chunk_100", "chunk_500"]
+
+        metrics = custom_evaluator.evaluate(query, retrieved_ids, golden_ids)
+
+        assert "hit_rate" in metrics
+        assert "mrr" in metrics
+        assert 0 <= metrics["hit_rate"] <= 1
+        assert 0 <= metrics["mrr"] <= 1
+
+    def test_evaluate_duplicate_retrieved_ids(self, custom_evaluator):
+        """Test evaluation handles duplicate retrieved IDs."""
+        query = "test query"
+        retrieved_ids = ["chunk_1", "chunk_1", "chunk_2", "chunk_2"]
+        golden_ids = ["chunk_1"]
+
+        metrics = custom_evaluator.evaluate(query, retrieved_ids, golden_ids)
+
+        assert metrics["hit_rate"] == 1/4
+        assert metrics["mrr"] == 1.0
+
+    def test_evaluate_duplicate_golden_ids(self, custom_evaluator):
+        """Test evaluation handles duplicate golden IDs."""
+        query = "test query"
+        retrieved_ids = ["chunk_1", "chunk_2"]
+        golden_ids = ["chunk_1", "chunk_1"]
+
+        metrics = custom_evaluator.evaluate(query, retrieved_ids, golden_ids)
+
+        assert metrics["hit_rate"] == 1/2
+
+    def test_evaluate_special_characters_in_ids(self, custom_evaluator):
+        """Test evaluation with special characters in chunk IDs."""
+        query = "special test"
+        retrieved_ids = ["chunk_001-v2@latest", "chunk_002/draft"]
+        golden_ids = ["chunk_001-v2@latest", "chunk_003.final"]
+
+        metrics = custom_evaluator.evaluate(query, retrieved_ids, golden_ids)
+
+        assert metrics["hit_rate"] == 1/2
+        assert metrics["mrr"] == 1.0
+
+    def test_evaluate_very_long_query(self, custom_evaluator):
+        """Test evaluation with very long query string."""
+        query = "test " * 1000  # Very long query
+        retrieved_ids = ["chunk_1", "chunk_2"]
+        golden_ids = ["chunk_1"]
+
+        metrics = custom_evaluator.evaluate(query, retrieved_ids, golden_ids)
+
+        assert "hit_rate" in metrics
+        assert metrics["hit_rate"] == 1/2
+
+    def test_evaluate_unicode_in_query(self, custom_evaluator):
+        """Test evaluation with unicode characters in query."""
+        query = "测试查询 🎯 тест query"
+        retrieved_ids = ["chunk_1", "chunk_2"]
+        golden_ids = ["chunk_1"]
+
+        metrics = custom_evaluator.evaluate(query, retrieved_ids, golden_ids)
+
+        assert metrics["hit_rate"] == 1/2
+
+    def test_evaluate_whitespace_only_query(self, custom_evaluator):
+        """Test evaluation with whitespace-only query."""
+        query = "   \t\n  "
+        retrieved_ids = ["chunk_1"]
+        golden_ids = ["chunk_1"]
+
+        metrics = custom_evaluator.evaluate(query, retrieved_ids, golden_ids)
+
+        assert metrics["hit_rate"] == 1.0
+
+    def test_factory_empty_provider_string(self):
+        """Test factory rejects empty provider string."""
+        class MockSettings:
+            provider = ""
+
+        factory = EvaluatorFactory()
+        with pytest.raises(ValueError):
+            factory.create(MockSettings())
