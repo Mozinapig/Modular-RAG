@@ -140,5 +140,18 @@ def _register_ragas():
         pass
 
 
-# Register ragas provider on module load
+# Lazy registration of CompositeEvaluator
+def _register_composite():
+    """Register CompositeEvaluator."""
+    try:
+        from src.observability.evaluation.composite_evaluator import CompositeEvaluator
+        EvaluatorFactory.register_provider("composite", CompositeEvaluator)
+    except ImportError:
+        # composite module not available, skip registration
+        pass
+
+
+# Register providers on module load
 _register_ragas()
+_register_composite()
+
