@@ -15,7 +15,7 @@ def show_overview(settings: Settings):
     config_service = ConfigService(settings)
 
     # Section 1: Component Configuration
-    st.heading("1️⃣ Component Configuration")
+    st.subheader("1️⃣ Component Configuration")
 
     col1, col2, col3 = st.columns(3)
 
@@ -46,7 +46,7 @@ def show_overview(settings: Settings):
     st.write("---")
 
     # Section 2: Retrieval Configuration
-    st.heading("2️⃣ Retrieval Configuration")
+    st.subheader("2️⃣ Retrieval Configuration")
 
     col1, col2 = st.columns(2)
 
@@ -70,7 +70,7 @@ def show_overview(settings: Settings):
     st.write("---")
 
     # Section 3: Data Statistics (placeholder for integration)
-    st.heading("3️⃣ Data Statistics")
+    st.subheader("3️⃣ Data Statistics")
 
     try:
         from src.libs.vector_store.chroma_store import ChromaStore
@@ -114,7 +114,7 @@ def show_overview(settings: Settings):
     st.write("---")
 
     # Section 4: Quick Links
-    st.heading("4️⃣ Quick Links")
+    st.subheader("4️⃣ Quick Links")
 
     col1, col2, col3 = st.columns(3)
 

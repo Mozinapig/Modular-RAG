@@ -21,7 +21,7 @@ def show_evaluation_panel(settings: Settings):
     st.write("---")
 
     # Section 1: Evaluation Configuration
-    st.heading("1️⃣ Evaluation Configuration")
+    st.subheader("1️⃣ Evaluation Configuration")
 
     col1, col2 = st.columns(2)
 
@@ -45,7 +45,7 @@ def show_evaluation_panel(settings: Settings):
     st.write("---")
 
     # Section 2: Run Evaluation
-    st.heading("2️⃣ Run Evaluation")
+    st.subheader("2️⃣ Run Evaluation")
 
     col1, col2 = st.columns([3, 1])
 
@@ -62,7 +62,7 @@ def show_evaluation_panel(settings: Settings):
     st.write("---")
 
     # Section 3: Recent Results
-    st.heading("3️⃣ Recent Evaluation Results")
+    st.subheader("3️⃣ Recent Evaluation Results")
 
     # Try to load trace service for historical results
     try:
@@ -85,7 +85,7 @@ def show_evaluation_panel(settings: Settings):
     st.write("---")
 
     # Section 4: Quick Links
-    st.heading("4️⃣ Quick Links")
+    st.subheader("4️⃣ Quick Links")
 
     col1, col2, col3 = st.columns(3)
 

@@ -81,7 +81,8 @@ def main():
         from src.observability.dashboard.pages.query_traces import show_page as show_query_traces_page
         show_query_traces_page(settings)
     elif page_key == "pages/evaluation_panel":
-        st.info("📊 Evaluation Panel page - Coming soon")
+        from src.observability.dashboard.pages.evaluation_panel import show_evaluation_panel
+        show_evaluation_panel(settings)
 
 
 if __name__ == "__main__":
