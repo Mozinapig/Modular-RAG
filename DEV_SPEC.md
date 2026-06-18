@@ -2046,7 +2046,7 @@ dashboard:
 |---------|---------|------|---------|------|
 | H1 | RagasEvaluator 实现 | [x] | 2026-06-18 | ✅ 完成：RagasEvaluator实现、21个单元测试全通过、工厂集成、ragas依赖添加 |
 | H2 | CompositeEvaluator 实现 | [x] | 2026-06-18 | ✅ 完成：CompositeEvaluator实现、18个单元测试全通过、工厂集成、多evaluator聚合 |
-| H3 | EvalRunner + Golden Test Set | [ ] | | |
+| H3 | EvalRunner + Golden Test Set | [x] | 2026-06-18 | ✅ 完成：EvalRunner实现、12个单元测试全通过、golden_test_set.json、evaluate.py脚本可运行 |
 | H4 | 评估面板页面 | [ ] | | |
 | H5 | Recall 回归测试（E2E） | [ ] | | |
 
@@ -2073,9 +2073,9 @@ dashboard:
 | 阶段 E | 6 | 6 | 100% |
 | 阶段 F | 5 | 5 | 100% |
 | 阶段 G | 6 | 6 | 100% |
-| 阶段 H | 5 | 2 | 40% |
+| 阶段 H | 5 | 3 | 60% |
 | 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **56** | **82%** |
+| **总计** | **68** | **57** | **84%** |
 
 
 ---
