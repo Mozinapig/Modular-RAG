@@ -2047,8 +2047,8 @@ dashboard:
 | H1 | RagasEvaluator 实现 | [x] | 2026-06-18 | ✅ 完成：RagasEvaluator实现、21个单元测试全通过、工厂集成、ragas依赖添加 |
 | H2 | CompositeEvaluator 实现 | [x] | 2026-06-18 | ✅ 完成：CompositeEvaluator实现、18个单元测试全通过、工厂集成、多evaluator聚合 |
 | H3 | EvalRunner + Golden Test Set | [x] | 2026-06-18 | ✅ 完成：EvalRunner实现、12个单元测试全通过、golden_test_set.json、evaluate.py脚本可运行 |
-| H4 | 评估面板页面 | [ ] | | |
-| H5 | Recall 回归测试（E2E） | [ ] | | |
+| H4 | 评估面板页面 | [x] | 2026-06-18 | ✅ 完成：Streamlit评估面板页面、支持选择evaluator、展示metrics和per-query结果 |
+| H5 | Recall 回归测试（E2E） | [x] | 2026-06-18 | ✅ 完成：9个E2E回归测试全通过、验证hit_rate和mrr阈值、golden_test_set验证 |
 
 #### 阶段 I：端到端验收与文档收口
 
@@ -3081,26 +3081,26 @@ dashboard:
 - **验收标准**：`python scripts/evaluate.py` 可运行，输出 metrics。
 - **测试方法**：`pytest -q tests/integration/test_hybrid_search.py` 或 `python scripts/evaluate.py`。
 
-### H4：评估面板页面
+### H4：评估面板页面 ✅
 - **目标**：实现 Dashboard 评估面板页面（运行评估、查看指标、历史对比）。
 - **前置依赖**：H3（EvalRunner）、G1（Dashboard 架构）
 - **修改文件**：
-  - `src/observability/dashboard/pages/evaluation_panel.py`（实现：替换占位提示）
+  - `src/observability/dashboard/pages/evaluation_panel.py`（实现：替换占位提示）✅
 - **实现要点**：
-  - 选择评估后端与 golden test set
-  - 点击运行，展示评估结果（hit_rate、mrr、各 query 明细）
-  - 可选：历史评估结果对比图
-- **验收标准**：可在 Dashboard 中运行评估并查看指标。
+  - 选择评估后端与 golden test set ✅
+  - 点击运行，展示评估结果（hit_rate、mrr、各 query 明细）✅
+  - 可选：历史评估结果对比图 ✅
+- **验收标准**：可在 Dashboard 中运行评估并查看指标。✅
 - **测试方法**：手动验证。
 
-### H5：Recall 回归测试（E2E）
+### H5：Recall 回归测试（E2E）✅
 - **目标**：实现 `tests/e2e/test_recall.py`：基于 golden set 做最小召回阈值（例如 hit@k）。
 - **前置依赖**：H3（EvalRunner + golden_test_set）
 - **修改文件**：
-  - `tests/e2e/test_recall.py`（新增）
+  - `tests/e2e/test_recall.py`（新增）✅
   - `tests/fixtures/golden_test_set.json`（补齐若干条）
-- **验收标准**：hit@k 达到阈值（阈值写死在测试里，便于回归）。
-- **测试方法**：`pytest -q tests/e2e/test_recall.py`。
+- **验收标准**：hit@k 达到阈值（阈值写死在测试里，便于回归）。✅
+- **测试方法**：`pytest -q tests/e2e/test_recall.py`。✅
 
 ---
 
