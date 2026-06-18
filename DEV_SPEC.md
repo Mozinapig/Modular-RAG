@@ -2074,8 +2074,8 @@ dashboard:
 | 阶段 F | 5 | 5 | 100% |
 | 阶段 G | 6 | 6 | 100% |
 | 阶段 H | 5 | 5 | 100% |
-| 阶段 I | 5 | 0 | 0% |
-| **总计** | **68** | **59** | **87%** |
+| 阶段 I | 5 | 1 | 20% |
+| **总计** | **68** | **60** | **88%** |
 
 
 ---
@@ -3106,12 +3106,14 @@ dashboard:
 
 ## 阶段 I：端到端验收与文档收口（目标：开箱即用的"可复现"工程）
 
-### I1：E2E：MCP Client 侧调用模拟
+### I1：E2E：MCP Client 侧调用模拟 ✅
 - **目标**：实现 `tests/e2e/test_mcp_client.py`：以子进程启动 server，模拟 tools/list + tools/call。
 - **修改文件**：
-  - `tests/e2e/test_mcp_client.py`
-- **验收标准**：完整走通 query_knowledge_hub 并返回 citations。
-- **测试方法**：`pytest -q tests/e2e/test_mcp_client.py`。
+  - `tests/e2e/test_mcp_client.py`（新增）✅
+  - `src/mcp_server/__main__.py`（新增）✅
+  - `src/mcp_server/tools/query_knowledge_hub.py`（修复 settings 加载）✅
+- **验收标准**：完整走通 query_knowledge_hub 并返回 citations。✅
+- **测试方法**：`pytest -q tests/e2e/test_mcp_client.py`。✅（10/10 通过）
 
 ### I2：E2E：Dashboard 冒烟测试
 - **目标**：验证 Dashboard 各页面在有数据时可正常渲染、无 Python 异常。
