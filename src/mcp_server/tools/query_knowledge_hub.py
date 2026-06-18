@@ -3,6 +3,7 @@ query_knowledge_hub Tool - E3 任务实现
 Main tool for querying the knowledge hub with hybrid search
 """
 import logging
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from src.core.query_engine.hybrid_search import HybridSearch
@@ -14,6 +15,22 @@ from src.core.trace.trace_context import TraceContext
 from src.observability.logger import get_logger
 
 logger = get_logger(__name__)
+
+
+def _get_settings_path() -> str:
+    """Get the path to settings.yaml relative to project root."""
+    # Try multiple common locations
+    candidates = [
+        Path(__file__).parent.parent.parent.parent / 'config' / 'settings.yaml',  # src/../config
+        Path('config') / 'settings.yaml',
+        Path.cwd() / 'config' / 'settings.yaml',
+    ]
+
+    for candidate in candidates:
+        if candidate.exists():
+            return str(candidate)
+
+    raise FileNotFoundError("Could not find config/settings.yaml in any expected location")
 
 
 def query_knowledge_hub(
@@ -37,8 +54,9 @@ def query_knowledge_hub(
     try:
         logger.info(f"Processing query: {query[:100]}")
 
-        # Load settings
-        settings = load_settings()
+        # Load settings from default location
+        settings_path = _get_settings_path()
+        settings = load_settings(settings_path)
 
         # Create trace context
         trace = TraceContext(trace_type="query")
